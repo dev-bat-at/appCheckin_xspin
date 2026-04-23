@@ -12,6 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:stacked/stacked.dart';
 
+const _defaultAutoCheckinBackgroundUrl =
+    'https://xspin.vn/images/phan-mem-check-in.jpg';
+
 class AutoCheckinPage extends StatefulWidget {
   const AutoCheckinPage({
     super.key,
@@ -33,10 +36,15 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
   void initState() {
     super.initState();
     _qrViewModel.indexViewModel = widget.indexViewModel;
-    _qrViewModel.initScanner(facing: CameraFacing.front);
+    final loginViewModel = widget.indexViewModel.loginViewModel;
+    _qrViewModel.initScanner(
+      facing: _resolveCameraFacing(loginViewModel.userLogin?.cameraCheckin),
+    );
     WidgetsBinding.instance.addObserver(this);
-    if (widget.indexViewModel.loginViewModel.userLogin == null) {
-      unawaited(widget.indexViewModel.loginViewModel.loadUser());
+    if (loginViewModel.userLogin == null) {
+      unawaited(
+        loginViewModel.loadUser().then((_) => _syncPreferredCamera()),
+      );
     }
   }
 
@@ -104,6 +112,28 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
     await _qrViewModel.startScannerSafely();
   }
 
+  CameraFacing _resolveCameraFacing(String? cameraSetting) {
+    switch (cameraSetting?.trim()) {
+      case 'CameraSau':
+        return CameraFacing.back;
+      case 'CameraTruoc':
+      default:
+        return CameraFacing.front;
+    }
+  }
+
+  Future<void> _syncPreferredCamera() async {
+    if (!mounted) {
+      return;
+    }
+
+    await _qrViewModel.configureScannerFacing(
+      _resolveCameraFacing(
+        widget.indexViewModel.loginViewModel.userLogin?.cameraCheckin,
+      ),
+    );
+  }
+
   Future<void> _closeScanner() async {
     _qrViewModel.unbindScannerPage();
     await _qrViewModel.stopScannerSafely();
@@ -150,145 +180,90 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
 
         return Scaffold(
           backgroundColor: Colors.black,
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              final scanSize = math.min(
-                constraints.maxWidth * 0.76,
-                320.0,
-              );
-              final scanWindow = Rect.fromCenter(
-                center: Offset(
-                  constraints.maxWidth / 2,
-                  constraints.maxHeight / 2,
-                ),
-                width: scanSize,
-                height: scanSize,
-              );
+          body: ViewModelBuilder<LoginViewModel>.reactive(
+            disposeViewModel: false,
+            viewModelBuilder: () => widget.indexViewModel.loginViewModel,
+            builder: (context, loginViewModel, child) {
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  final scanSize = math.min(
+                    constraints.maxWidth * 0.76,
+                    320.0,
+                  );
+                  final scanWindow = Rect.fromCenter(
+                    center: Offset(
+                      constraints.maxWidth / 2,
+                      constraints.maxHeight / 2,
+                    ),
+                    width: scanSize,
+                    height: scanSize,
+                  );
 
-              return Stack(
-                fit: StackFit.expand,
-                children: [
-                  Transform(
-                    alignment: Alignment.center,
-                    transform: Matrix4.identity()..rotateY(math.pi),
-                    child: MobileScanner(
-                      controller: viewModel.scannerController!,
-                      fit: BoxFit.cover,
-                      onDetect: _handleDetection,
-                    ),
-                  ),
-                  IgnorePointer(
-                    child: CustomPaint(
-                      painter: _ScannerOverlayPainter(scanWindow),
-                      child: const SizedBox.expand(),
-                    ),
-                  ),
-                  Positioned.fromRect(
-                    rect: scanWindow,
-                    child: _ScanGuideFrame(
-                      size: scanSize,
-                      accentColor: viewModel.isBusy
-                          ? AppColor.oriColor
-                          : AppColor.primaryColor,
-                    ),
-                  ),
-                  SafeArea(
-                    child: Align(
-                      alignment: Alignment.topRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 16, right: 16),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(18),
-                            onTap: _closeScanner,
-                            child: Ink(
-                              width: 42,
-                              height: 42,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.42),
+                  final scanner = MobileScanner(
+                    controller: viewModel.scannerController!,
+                    fit: BoxFit.cover,
+                    onDetect: _handleDetection,
+                  );
+
+                  return Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      viewModel.isFrontCamera
+                          ? Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()..rotateY(math.pi),
+                              child: scanner,
+                            )
+                          : scanner,
+                      _AutoCheckinBackgroundLayer(
+                        imageQr: loginViewModel.userLogin?.imageQr,
+                        cutoutRect: scanWindow,
+                      ),
+                      Positioned.fromRect(
+                        rect: scanWindow,
+                        child: _ScanGuideFrame(
+                          size: scanSize,
+                          accentColor: viewModel.isBusy
+                              ? AppColor.oriColor
+                              : AppColor.primaryColor,
+                        ),
+                      ),
+                      SafeArea(
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 16, right: 16),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
                                 borderRadius: BorderRadius.circular(18),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.14),
+                                onTap: _closeScanner,
+                                child: Ink(
+                                  width: 42,
+                                  height: 42,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.42),
+                                    borderRadius: BorderRadius.circular(18),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.14,
+                                      ),
+                                    ),
+                                  ),
+                                  child: const Icon(
+                                    Icons.close_rounded,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
                                 ),
-                              ),
-                              child: const Icon(
-                                Icons.close_rounded,
-                                color: Colors.white,
-                                size: 20,
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 50,
-                    child: Center(
-                      child: ViewModelBuilder<LoginViewModel>.reactive(
-                        disposeViewModel: false,
-                        viewModelBuilder: () =>
-                            widget.indexViewModel.loginViewModel,
-                        builder: (context, loginViewModel, child) {
-                          return _AutoCheckinFooter(
-                            imageQr: loginViewModel.userLogin?.imageQr,
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  // Positioned(
-                  //   top: scanWindow.bottom + 20,
-                  //   left: 24,
-                  //   right: 24,
-                  //   child: Center(
-                  //     child: Container(
-                  //       constraints: const BoxConstraints(maxWidth: 280),
-                  //       padding: const EdgeInsets.symmetric(
-                  //         horizontal: 16,
-                  //         vertical: 12,
-                  //       ),
-                  //       decoration: BoxDecoration(
-                  //         color: Colors.black.withValues(alpha: 0.42),
-                  //         borderRadius: BorderRadius.circular(18),
-                  //         border: Border.all(
-                  //           color: Colors.white.withValues(alpha: 0.1),
-                  //         ),
-                  //       ),
-                  //       child: Column(
-                  //         mainAxisSize: MainAxisSize.min,
-                  //         children: [
-                  //           Text(
-                  //             viewModel.isBusy
-                  //                 ? 'Dang xu ly ma QR...'
-                  //                 : 'Dua ma QR vao giua khung de quet',
-                  //             textAlign: TextAlign.center,
-                  //             style: const TextStyle(
-                  //               color: Colors.white,
-                  //               fontWeight: FontWeight.w700,
-                  //               fontSize: 15,
-                  //             ),
-                  //           ),
-                  //           if (currentLine.isNotEmpty) ...[
-                  //             const SizedBox(height: 8),
-                  //             Text(
-                  //               'Line hien tai: $currentLine',
-                  //               textAlign: TextAlign.center,
-                  //               style: TextStyle(
-                  //                 color: Colors.white.withValues(alpha: 0.82),
-                  //                 fontWeight: FontWeight.w500,
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                ],
+                    ],
+                  );
+                },
               );
             },
           ),
@@ -344,44 +319,54 @@ class _ScanGuideFrame extends StatelessWidget {
   }
 }
 
-class _AutoCheckinFooter extends StatelessWidget {
-  const _AutoCheckinFooter({
+class _AutoCheckinBackgroundLayer extends StatelessWidget {
+  const _AutoCheckinBackgroundLayer({
     required this.imageQr,
+    required this.cutoutRect,
   });
 
   final String? imageQr;
+  final Rect cutoutRect;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 104,
-      height: 104,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.42),
-        borderRadius: BorderRadius.circular(26),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.12),
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: _buildImageContent(),
+    final backgroundImage = _buildImageContent();
+    return IgnorePointer(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (backgroundImage != null)
+            ClipPath(
+              clipper: _InvertedCutoutClipper(cutoutRect),
+              child: backgroundImage,
+            ),
+          CustomPaint(
+            painter: _ScannerOverlayPainter(
+              cutoutRect,
+              overlayColor: backgroundImage == null
+                  ? Colors.black.withValues(alpha: 0.42)
+                  : Colors.black.withValues(alpha: 0.18),
+            ),
+            child: const SizedBox.expand(),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildImageContent() {
-    final rawImage = imageQr?.trim() ?? '';
+  Widget? _buildImageContent() {
+    final rawImage = (imageQr?.trim().isNotEmpty ?? false)
+        ? imageQr!.trim()
+        : _defaultAutoCheckinBackgroundUrl;
     if (rawImage.isEmpty) {
-      return _FooterPlaceholder();
+      return null;
     }
 
     if (rawImage.startsWith('http://') || rawImage.startsWith('https://')) {
       return Image.network(
         rawImage,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => _FooterPlaceholder(),
+        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
       );
     }
 
@@ -390,11 +375,11 @@ class _AutoCheckinFooter extends StatelessWidget {
       return Image.memory(
         bytes,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => _FooterPlaceholder(),
+        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
       );
     }
 
-    return _FooterPlaceholder();
+    return null;
   }
 
   Uint8List? _tryDecodeImage(String rawImage) {
@@ -410,30 +395,47 @@ class _AutoCheckinFooter extends StatelessWidget {
   }
 }
 
-class _FooterPlaceholder extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white.withValues(alpha: 0.08),
-      child: const Center(
-        child: Icon(
-          Icons.qr_code_2_rounded,
-          color: Colors.white,
-          size: 44,
-        ),
-      ),
-    );
-  }
-}
-
-class _ScannerOverlayPainter extends CustomPainter {
-  const _ScannerOverlayPainter(this.cutoutRect);
+class _InvertedCutoutClipper extends CustomClipper<Path> {
+  const _InvertedCutoutClipper(this.cutoutRect);
 
   final Rect cutoutRect;
 
   @override
+  Path getClip(Size size) {
+    final fullRect = Path()..addRect(Offset.zero & size);
+    final cutoutPath = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          cutoutRect,
+          const Radius.circular(28),
+        ),
+      );
+
+    return Path.combine(
+      PathOperation.difference,
+      fullRect,
+      cutoutPath,
+    );
+  }
+
+  @override
+  bool shouldReclip(covariant _InvertedCutoutClipper oldClipper) {
+    return oldClipper.cutoutRect != cutoutRect;
+  }
+}
+
+class _ScannerOverlayPainter extends CustomPainter {
+  const _ScannerOverlayPainter(
+    this.cutoutRect, {
+    required this.overlayColor,
+  });
+
+  final Rect cutoutRect;
+  final Color overlayColor;
+
+  @override
   void paint(Canvas canvas, Size size) {
-    final overlayPaint = Paint()..color = Colors.black.withValues(alpha: 0.42);
+    final overlayPaint = Paint()..color = overlayColor;
     final fullRect = Offset.zero & size;
     final cutoutRRect = RRect.fromRectAndRadius(
       cutoutRect,
@@ -453,7 +455,8 @@ class _ScannerOverlayPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _ScannerOverlayPainter oldDelegate) {
-    return oldDelegate.cutoutRect != cutoutRect;
+    return oldDelegate.cutoutRect != cutoutRect ||
+        oldDelegate.overlayColor != overlayColor;
   }
 }
 
