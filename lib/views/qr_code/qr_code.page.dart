@@ -5,6 +5,7 @@ import 'package:checkin/base/base_page.dart';
 import 'package:checkin/constants/app_fontsize.dart';
 import 'package:checkin/viewmodel/index.vm.dart';
 import 'package:checkin/viewmodel/qr_code.vm.dart';
+import 'package:checkin/views/qr_code/scan_window_barcode_filter.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
@@ -121,32 +122,63 @@ class _QrCodePageState extends State<QrCodePage>
                   children: [
                     Expanded(
                       flex: 2,
-                      child: Stack(
-                        children: [
-                          MobileScanner(
-                            controller: viewModel.scannerController!,
-                            onDetect: (qrcode) async {
-                              if (!viewModel.isScanQr) {
-                                viewModel.isScanQr = true;
-                                final List<Barcode> barcodes = qrcode.barcodes;
-                                for (final barcode in barcodes) {
-                                  final String? rawValue = barcode.rawValue;
-                                  if (rawValue != null) {
-                                    viewModel.currentQRCode = rawValue;
-                                    print('QR Code found: $rawValue');
-                                    await viewModel.getUsers();
-                                    break; // Thoát sau khi xử lý mã đầu tiên
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final scanWindow = Rect.fromCenter(
+                            center: Offset(
+                              constraints.maxWidth / 2,
+                              constraints.maxHeight / 2,
+                            ),
+                            width: 250,
+                            height: 250,
+                          );
+
+                          return Stack(
+                            children: [
+                              MobileScanner(
+                                controller: viewModel.scannerController!,
+                                scanWindow: scanWindow,
+                                scanWindowUpdateThreshold: 8,
+                                onDetect: (qrcode) async {
+                                  if (!viewModel.isScanQr) {
+                                    viewModel.isScanQr = true;
+                                    try {
+                                      final List<Barcode> barcodes = qrcode
+                                          .barcodes
+                                          .where(
+                                            (barcode) =>
+                                                isBarcodeInsideScanWindow(
+                                              barcode: barcode,
+                                              cameraPreviewSize: qrcode.size,
+                                              widgetSize: constraints.biggest,
+                                              scanWindow: scanWindow,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          )
+                                          .toList();
+                                      for (final barcode in barcodes) {
+                                        final String? rawValue =
+                                            barcode.rawValue;
+                                        if (rawValue != null) {
+                                          viewModel.currentQRCode = rawValue;
+                                          print('QR Code found: $rawValue');
+                                          await viewModel.getUsers();
+                                          break;
+                                        }
+                                      }
+                                    } finally {
+                                      viewModel.isScanQr = false;
+                                    }
                                   }
-                                }
-                                viewModel.isScanQr = false;
-                              }
-                            },
-                          ),
-                          QRScannerOverlay(
-                            overlayColor: Colors.black.withOpacity(0.5),
-                            scanAreaSize: Size(250, 250),
-                          ),
-                        ],
+                                },
+                              ),
+                              QRScannerOverlay(
+                                overlayColor: Colors.black.withOpacity(0.5),
+                                scanAreaSize: const Size(250, 250),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ],

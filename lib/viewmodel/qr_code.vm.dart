@@ -21,6 +21,7 @@ class QRCodeViewModel extends BaseViewModel {
   late BuildContext viewContext;
   QRCodeRequest qrCodeRequest = QRCodeRequest();
   final AudioPlayer _audioPlayer = AudioPlayer();
+  CameraFacing _scannerFacing = CameraFacing.back;
   List<Users>? listUser;
   Users? currentUser;
   String? currentQRCode;
@@ -57,7 +58,7 @@ class QRCodeViewModel extends BaseViewModel {
   void bindScannerPage(BuildContext context) {
     viewContext = context;
     _isScannerPageActive = true;
-    initScanner();
+    initScanner(facing: _scannerFacing);
   }
 
   void unbindScannerPage() {
@@ -65,13 +66,36 @@ class QRCodeViewModel extends BaseViewModel {
   }
 
   void initScanner({CameraFacing facing = CameraFacing.back}) {
+    _scannerFacing = facing;
+    isFrontCamera = facing == CameraFacing.front;
     if (scannerController == null) {
       scannerController = MobileScannerController(
         autoStart: false,
-        facing: facing,
+        facing: _scannerFacing,
         detectionSpeed: DetectionSpeed.noDuplicates,
         detectionTimeoutMs: 500,
       );
+    }
+  }
+
+  Future<void> configureScannerFacing(CameraFacing facing) async {
+    if (_scannerFacing == facing && scannerController != null) {
+      return;
+    }
+
+    final wasScannerPageActive = _isScannerPageActive;
+    _scannerFacing = facing;
+    isFrontCamera = facing == CameraFacing.front;
+
+    if (scannerController != null) {
+      await disposeScanner();
+    }
+    _isScannerPageActive = wasScannerPageActive;
+    initScanner(facing: facing);
+    notifyListeners();
+
+    if (wasScannerPageActive) {
+      await startScannerSafely();
     }
   }
 
