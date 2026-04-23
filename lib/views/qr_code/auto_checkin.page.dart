@@ -8,6 +8,7 @@ import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/viewmodel/index.vm.dart';
 import 'package:checkin/viewmodel/login.vm.dart';
 import 'package:checkin/viewmodel/qr_code.vm.dart';
+import 'package:checkin/views/qr_code/scan_window_barcode_filter.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:stacked/stacked.dart';
@@ -142,12 +143,25 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
     }
   }
 
-  Future<void> _handleDetection(BarcodeCapture capture) async {
+  Future<void> _handleDetection(
+    BarcodeCapture capture, {
+    required Rect scanWindow,
+    required Size previewSize,
+  }) async {
     if (_qrViewModel.isScanQr) {
       return;
     }
 
-    final barcodes = capture.barcodes;
+    final barcodes = capture.barcodes.where((barcode) {
+      return isBarcodeInsideScanWindow(
+        barcode: barcode,
+        cameraPreviewSize: capture.size,
+        widgetSize: previewSize,
+        scanWindow: scanWindow,
+        fit: BoxFit.cover,
+      );
+    });
+
     for (final barcode in barcodes) {
       final rawValue = barcode.rawValue?.trim();
       if (rawValue == null || rawValue.isEmpty) {
@@ -202,7 +216,13 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
                   final scanner = MobileScanner(
                     controller: viewModel.scannerController!,
                     fit: BoxFit.cover,
-                    onDetect: _handleDetection,
+                    scanWindow: scanWindow,
+                    scanWindowUpdateThreshold: 8,
+                    onDetect: (capture) => _handleDetection(
+                      capture,
+                      scanWindow: scanWindow,
+                      previewSize: constraints.biggest,
+                    ),
                   );
 
                   return Stack(
