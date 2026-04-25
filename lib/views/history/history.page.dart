@@ -101,17 +101,7 @@ class _HistoryPageState extends State<HistoryPage>
 
   Future<void> _refreshData() async {
     setState(() {});
-    await Future.wait([
-      widget.usersViewModel.selectedStatus == 'all'
-          ? widget.usersViewModel.getUsers()
-          : widget.usersViewModel
-              .getUsersByStatus(widget.usersViewModel.selectedStatus),
-      widget.usersViewModel
-          .getCountUserJoin(widget.usersViewModel.selectedStatus),
-      widget.usersViewModel.getCountUser(),
-      widget.usersViewModel.getSumUserJoin(),
-      widget.usersViewModel.getCountUserCheckIn(),
-    ]);
+    await widget.usersViewModel.reloadUsers();
   }
 
   @override
@@ -154,6 +144,7 @@ class _HistoryPageState extends State<HistoryPage>
                 color: AppColor.primaryColor,
                 child: ListView(
                   controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
                   children: [
                     Container(
                       padding: const EdgeInsets.all(8.0),

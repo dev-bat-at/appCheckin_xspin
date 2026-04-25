@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:checkin/app/app_route_observer.dart';
 import 'package:checkin/constants/app_color.dart';
@@ -12,9 +13,6 @@ import 'package:checkin/views/qr_code/scan_window_barcode_filter.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:stacked/stacked.dart';
-
-const _defaultAutoCheckinBackgroundUrl =
-    'https://xspin.vn/images/phan-mem-check-in.jpg';
 
 class AutoCheckinPage extends StatefulWidget {
   const AutoCheckinPage({
@@ -270,10 +268,12 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
                                       ),
                                     ),
                                   ),
-                                  child: const Icon(
-                                    Icons.close_rounded,
-                                    color: Colors.white,
-                                    size: 20,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(9),
+                                    child: Image.asset(
+                                      'assets/logo_close.png',
+                                      fit: BoxFit.contain,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -350,20 +350,41 @@ class _AutoCheckinBackgroundLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundImage = _buildImageContent();
+    final backgroundImage = _buildImageProvider();
+    final hasBackgroundImage = backgroundImage != null;
+
     return IgnorePointer(
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (backgroundImage != null)
+          if (hasBackgroundImage)
             ClipPath(
               clipper: _InvertedCutoutClipper(cutoutRect),
-              child: backgroundImage,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  image: DecorationImage(
+                    image: backgroundImage,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: const SizedBox.expand(),
+              ),
+            ),
+          if (!hasBackgroundImage)
+            ClipPath(
+              clipper: _InvertedCutoutClipper(cutoutRect),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                child: Container(
+                  color: Colors.black.withValues(alpha: 0.28),
+                ),
+              ),
             ),
           CustomPaint(
             painter: _ScannerOverlayPainter(
               cutoutRect,
-              overlayColor: backgroundImage == null
+              overlayColor: !hasBackgroundImage
                   ? Colors.black.withValues(alpha: 0.42)
                   : Colors.black.withValues(alpha: 0.18),
             ),
@@ -374,29 +395,19 @@ class _AutoCheckinBackgroundLayer extends StatelessWidget {
     );
   }
 
-  Widget? _buildImageContent() {
-    final rawImage = (imageQr?.trim().isNotEmpty ?? false)
-        ? imageQr!.trim()
-        : _defaultAutoCheckinBackgroundUrl;
+  ImageProvider<Object>? _buildImageProvider() {
+    final rawImage = imageQr?.trim() ?? '';
     if (rawImage.isEmpty) {
       return null;
     }
 
     if (rawImage.startsWith('http://') || rawImage.startsWith('https://')) {
-      return Image.network(
-        rawImage,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
-      );
+      return NetworkImage(rawImage);
     }
 
     final bytes = _tryDecodeImage(rawImage);
     if (bytes != null) {
-      return Image.memory(
-        bytes,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
-      );
+      return MemoryImage(bytes);
     }
 
     return null;

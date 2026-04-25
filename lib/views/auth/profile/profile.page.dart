@@ -114,6 +114,26 @@ class _ProfilePageState extends State<ProfilePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
+                              'Mã khách hàng',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: AppFontSize.sizeSmall,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Card(
+                                color: AppColor.extraColor.withOpacity(0.85),
+                                elevation: 4.0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: ListTile(
+                                    leading: const Icon(Icons.account_circle),
+                                    title: Text(
+                                        viewModel.userLogin?.maKhachHang ??
+                                            ''))),
+                            SizedBox(height: 10),
+                            Text(
                               'Mã sự kiện',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,

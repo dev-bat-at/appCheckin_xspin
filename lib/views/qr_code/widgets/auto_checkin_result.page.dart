@@ -33,7 +33,7 @@ class _AutoCheckinResultPageState extends State<AutoCheckinResultPage> {
     super.initState();
     unawaited(_loadLoginInfoIfNeeded());
     _dismissTimer = Timer(
-      Duration(milliseconds: widget.isSuccess ? 1700 : 1500),
+      const Duration(milliseconds: 2500),
       _closeIfMounted,
     );
   }
@@ -65,10 +65,20 @@ class _AutoCheckinResultPageState extends State<AutoCheckinResultPage> {
 
   @override
   Widget build(BuildContext context) {
-    final accentColor =
-        widget.isSuccess ? const Color(0xFF0F7B6C) : AppColor.primaryColor;
-    final softBackground =
-        widget.isSuccess ? const Color(0xFFF0FBF8) : const Color(0xFFFFF4F3);
+    final mediaQuery = MediaQuery.of(context);
+    final isTablet = mediaQuery.size.shortestSide >= 600;
+    final accentColor = widget.isSuccess ? Colors.green : AppColor.primaryColor;
+    final softBackground = widget.isSuccess
+        ? const Color.fromARGB(255, 240, 251, 243)
+        : const Color(0xFFFFF4F3);
+    final horizontalPadding = isTablet ? 40.0 : 20.0;
+    final cardPadding = isTablet ? 28.0 : 20.0;
+    final maxCardWidth = isTablet ? 620.0 : double.infinity;
+    final titleFontSize = isTablet ? 28.0 : 24.0;
+    final messageFontSize = isTablet ? 16.0 : 14.0;
+    final footerFontSize = isTablet ? 15.0 : 14.0;
+    final iconBoxSize = isTablet ? 104.0 : 88.0;
+    final iconSize = isTablet ? 60.0 : 52.0;
 
     return ViewModelBuilder<QRCodeViewModel>.reactive(
       disposeViewModel: false,
@@ -84,106 +94,117 @@ class _AutoCheckinResultPageState extends State<AutoCheckinResultPage> {
           body: SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [
-                      BoxShadow(
-                        color: accentColor.withValues(alpha: 0.14),
-                        blurRadius: 24,
-                        offset: const Offset(0, 12),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Container(
-                          width: 88,
-                          height: 88,
-                          decoration: BoxDecoration(
-                            color: softBackground,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            widget.isSuccess
-                                ? Icons.check_circle_rounded
-                                : Icons.error_outline_rounded,
-                            color: accentColor,
-                            size: 52,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      Center(
-                        child: Text(
-                          widget.isSuccess
-                              ? 'Check-in thành công'
-                              : 'Không thể check-in',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: accentColor,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Center(
-                        child: Text(
-                          widget.isSuccess
-                              ? 'Hệ thống sẽ tự quay lại để tiếp tục quét.'
-                              : (widget.description ??
-                                  'Vui lòng thử lại với mã QR khác.'),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.grey[700],
-                            height: 1.45,
-                          ),
-                        ),
-                      ),
-                      if (widget.isSuccess && currentUser != null) ...[
-                        const SizedBox(height: 22),
-                        _AutoInfoTile(
-                          label: 'Mã QR',
-                          value: currentUser.maQR,
-                          accentColor: accentColor,
-                          backgroundColor: softBackground,
-                        ),
-                        if (currentLineName.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 12),
-                            child: _AutoInfoTile(
-                              label: 'Line check-in',
-                              value: currentLineName,
-                              accentColor: accentColor,
-                              backgroundColor: softBackground,
-                            ),
-                          ),
-                        const SizedBox(height: 16),
-                        ..._buildFieldTiles(
-                          loginInfo: loginInfo,
-                          currentUser: currentUser,
-                          accentColor: accentColor,
-                          backgroundColor: softBackground,
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  vertical: isTablet ? 28 : 20,
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: maxCardWidth),
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(cardPadding),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [
+                        BoxShadow(
+                          color: accentColor.withValues(alpha: 0.14),
+                          blurRadius: 24,
+                          offset: const Offset(0, 12),
                         ),
                       ],
-                      const SizedBox(height: 18),
-                      Center(
-                        child: Text(
-                          'Tự động đóng sau giây lát...',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontStyle: FontStyle.italic,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            width: iconBoxSize,
+                            height: iconBoxSize,
+                            decoration: BoxDecoration(
+                              color: softBackground,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              widget.isSuccess
+                                  ? Icons.check_circle_rounded
+                                  : Icons.error_outline_rounded,
+                              color: accentColor,
+                              size: iconSize,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        SizedBox(height: isTablet ? 22 : 18),
+                        Center(
+                          child: Text(
+                            widget.isSuccess
+                                ? 'Check-in thành công'
+                                : 'Không thể check-in',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: accentColor,
+                              fontSize: titleFontSize,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: isTablet ? 10 : 8),
+                        Center(
+                          child: Text(
+                            widget.isSuccess
+                                ? 'Hệ thống sẽ tự quay lại để tiếp tục quét.'
+                                : (widget.description ??
+                                    'Vui lòng thử lại với mã QR khác.'),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.grey[700],
+                              fontSize: messageFontSize,
+                              height: 1.45,
+                            ),
+                          ),
+                        ),
+                        if (widget.isSuccess && currentUser != null) ...[
+                          SizedBox(height: isTablet ? 26 : 22),
+                          _AutoInfoTile(
+                            label: 'Mã QR',
+                            value: currentUser.maQR,
+                            accentColor: accentColor,
+                            backgroundColor: softBackground,
+                            isTablet: isTablet,
+                          ),
+                          if (currentLineName.isNotEmpty)
+                            Padding(
+                              padding: EdgeInsets.only(top: isTablet ? 14 : 12),
+                              child: _AutoInfoTile(
+                                label: 'Line check-in',
+                                value: currentLineName,
+                                accentColor: accentColor,
+                                backgroundColor: softBackground,
+                                isTablet: isTablet,
+                              ),
+                            ),
+                          SizedBox(height: isTablet ? 18 : 16),
+                          ..._buildFieldTiles(
+                            loginInfo: loginInfo,
+                            currentUser: currentUser,
+                            accentColor: accentColor,
+                            backgroundColor: softBackground,
+                            isTablet: isTablet,
+                          ),
+                        ],
+                        SizedBox(height: isTablet ? 20 : 18),
+                        Center(
+                          child: Text(
+                            'Tự động đóng sau giây lát...',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: footerFontSize,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -199,6 +220,7 @@ class _AutoCheckinResultPageState extends State<AutoCheckinResultPage> {
     required Users currentUser,
     required Color accentColor,
     required Color backgroundColor,
+    required bool isTablet,
   }) {
     final fieldPairs = <MapEntry<String, String>>[];
 
@@ -237,12 +259,13 @@ class _AutoCheckinResultPageState extends State<AutoCheckinResultPage> {
     return fieldPairs
         .map(
           (field) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+            padding: EdgeInsets.only(bottom: isTablet ? 14 : 12),
             child: _AutoInfoTile(
               label: field.key,
               value: field.value,
               accentColor: accentColor,
               backgroundColor: backgroundColor,
+              isTablet: isTablet,
             ),
           ),
         )
@@ -256,18 +279,20 @@ class _AutoInfoTile extends StatelessWidget {
     required this.value,
     required this.accentColor,
     required this.backgroundColor,
+    required this.isTablet,
   });
 
   final String label;
   final String value;
   final Color accentColor;
   final Color backgroundColor;
+  final bool isTablet;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(isTablet ? 16 : 14),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(18),
@@ -282,15 +307,16 @@ class _AutoInfoTile extends StatelessWidget {
             label,
             style: TextStyle(
               color: accentColor,
+              fontSize: isTablet ? 15 : 14,
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: isTablet ? 8 : 6),
           Text(
             value,
-            style: const TextStyle(
-              color: Color(0xFF1F2937),
-              fontSize: 16,
+            style: TextStyle(
+              color: Colors.green,
+              fontSize: isTablet ? 18 : 16,
               fontWeight: FontWeight.w600,
               height: 1.35,
             ),

@@ -184,22 +184,38 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder.reactive(
-        disposeViewModel: false,
-        viewModelBuilder: () => widget.qrCodeViewModel,
-        onViewModelReady: (viewModel) async {
-          Future.microtask(() async {
-            await viewModel.indexViewModel.loginViewModel.loadUser();
-          });
-        },
-        builder: (context, viewModel, child) {
-          return SafeArea(
-            child: Scaffold(
-              body: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Center(
+      disposeViewModel: false,
+      viewModelBuilder: () => widget.qrCodeViewModel,
+      onViewModelReady: (viewModel) async {
+        Future.microtask(() async {
+          await viewModel.indexViewModel.loginViewModel.loadUser();
+        });
+      },
+      builder: (context, viewModel, child) {
+        final mediaQuery = MediaQuery.of(context);
+        final isTablet = mediaQuery.size.shortestSide >= 600;
+        final maxContentWidth = isTablet ? 620.0 : double.infinity;
+        final pagePadding = isTablet ? 32.0 : 20.0;
+        final titleFontSize = isTablet
+            ? (AppFontSize.sizeLarge ?? 24) + 4
+            : (AppFontSize.sizeLarge ?? 24);
+        final qrFontSize = isTablet
+            ? (AppFontSize.sizeSuperLarge ?? 32) + 2
+            : (AppFontSize.sizeSuperLarge ?? 32);
+        final buttonFontSize = isTablet
+            ? (AppFontSize.sizeMedium ?? 20) + 1
+            : (AppFontSize.sizeMedium ?? 20);
+
+        return SafeArea(
+          child: Scaffold(
+            body: SingleChildScrollView(
+              padding: EdgeInsets.all(pagePadding),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: maxContentWidth),
                   child: Column(
                     children: [
-                      const SizedBox(height: 20),
+                      SizedBox(height: isTablet ? 28 : 20),
                       viewModel.isBusy
                           ? LoadingAnimationWidget.threeRotatingDots(
                               color: AppColor.successQRCode,
@@ -209,110 +225,122 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 if (viewModel.currentUser != null) ...[
-                                  // _buildFieldRow('Mã QR Code',
-                                  //     viewModel.currentUser!.maaaQR),
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 10),
                                     child: Text(
                                       "Check-in thành công!",
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
-                                          fontSize: AppFontSize.sizeLarge,
-                                          fontWeight: FontWeight.w900,
-                                          color: AppColor.successQRCode),
+                                        fontSize: titleFontSize,
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColor.successQRCode,
+                                      ),
                                     ),
                                   ),
-
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Mã QR:',
                                         style: TextStyle(
-                                            fontSize:
-                                                AppFontSize.sizeSuperLarge,
-                                            fontWeight: FontWeight.w900,
-                                            color: AppColor.successQRCode),
+                                          fontSize: qrFontSize,
+                                          fontWeight: FontWeight.w900,
+                                          color: AppColor.successQRCode,
+                                        ),
                                       ),
-                                      SizedBox(width: 15),
+                                      const SizedBox(width: 15),
                                       Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 5.0,
-                                            horizontal: 10.0,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 5,
+                                          horizontal: 10,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColor.successQRCode,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        child: Text(
+                                          viewModel.currentUser!.maQR,
+                                          style: TextStyle(
+                                            fontSize: qrFontSize,
+                                            color: AppColor.extraColor,
+                                            fontWeight: FontWeight.w900,
                                           ),
-                                          decoration: BoxDecoration(
-                                            color: AppColor.successQRCode,
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                          ),
-                                          child: Text(
-                                            viewModel.currentUser!.maQR,
-                                            style: TextStyle(
-                                              fontSize:
-                                                  AppFontSize.sizeSuperLarge,
-                                              color: AppColor.extraColor,
-                                              fontWeight: FontWeight.w900,
-                                            ),
-                                          )),
+                                        ),
+                                      ),
                                     ],
                                   ),
-                                  SizedBox(height: 20),
+                                  const SizedBox(height: 20),
                                   _buildFieldRow(
-                                      viewModel.indexViewModel.loginViewModel
-                                          .userLogin!.field2,
-                                      viewModel.currentUser!.field2),
+                                    viewModel.indexViewModel.loginViewModel
+                                        .userLogin!.field2,
+                                    viewModel.currentUser!.field2,
+                                  ),
                                   _buildFieldRow(
-                                      viewModel.indexViewModel.loginViewModel
-                                          .userLogin!.field3,
-                                      viewModel.currentUser!.field3),
+                                    viewModel.indexViewModel.loginViewModel
+                                        .userLogin!.field3,
+                                    viewModel.currentUser!.field3,
+                                  ),
                                   _buildFieldRow(
-                                      viewModel.indexViewModel.loginViewModel
-                                          .userLogin!.field4,
-                                      viewModel.currentUser!.field4),
+                                    viewModel.indexViewModel.loginViewModel
+                                        .userLogin!.field4,
+                                    viewModel.currentUser!.field4,
+                                  ),
                                   _buildFieldRow(
-                                      viewModel.indexViewModel.loginViewModel
-                                          .userLogin!.field5,
-                                      viewModel.currentUser!.field5),
+                                    viewModel.indexViewModel.loginViewModel
+                                        .userLogin!.field5,
+                                    viewModel.currentUser!.field5,
+                                  ),
                                   _buildFieldRow(
-                                      viewModel.indexViewModel.loginViewModel
-                                          .userLogin!.field6,
-                                      viewModel.currentUser!.field6),
+                                    viewModel.indexViewModel.loginViewModel
+                                        .userLogin!.field6,
+                                    viewModel.currentUser!.field6,
+                                  ),
                                   _buildFieldRow(
-                                      viewModel.indexViewModel.loginViewModel
-                                          .userLogin!.field7,
-                                      viewModel.currentUser!.field7),
+                                    viewModel.indexViewModel.loginViewModel
+                                        .userLogin!.field7,
+                                    viewModel.currentUser!.field7,
+                                  ),
                                   _buildFieldRow(
-                                      viewModel.indexViewModel.loginViewModel
-                                          .userLogin!.field8,
-                                      viewModel.currentUser!.field8),
+                                    viewModel.indexViewModel.loginViewModel
+                                        .userLogin!.field8,
+                                    viewModel.currentUser!.field8,
+                                  ),
                                   _buildFieldRow(
-                                      viewModel.indexViewModel.loginViewModel
-                                          .userLogin!.field9,
-                                      viewModel.currentUser!.field9),
+                                    viewModel.indexViewModel.loginViewModel
+                                        .userLogin!.field9,
+                                    viewModel.currentUser!.field9,
+                                  ),
                                   _buildFieldRow(
-                                      viewModel.indexViewModel.loginViewModel
-                                          .userLogin!.field10,
-                                      viewModel.currentUser!.field10),
+                                    viewModel.indexViewModel.loginViewModel
+                                        .userLogin!.field10,
+                                    viewModel.currentUser!.field10,
+                                  ),
                                   _buildFieldRow(
-                                      viewModel.indexViewModel.loginViewModel
-                                          .userLogin!.field11,
-                                      viewModel.currentUser!.field11),
+                                    viewModel.indexViewModel.loginViewModel
+                                        .userLogin!.field11,
+                                    viewModel.currentUser!.field11,
+                                  ),
                                   _buildFieldRow(
-                                      viewModel.indexViewModel.loginViewModel
-                                          .userLogin!.field12,
-                                      viewModel.currentUser!.field12),
+                                    viewModel.indexViewModel.loginViewModel
+                                        .userLogin!.field12,
+                                    viewModel.currentUser!.field12,
+                                  ),
                                   _buildFieldRow(
-                                      viewModel.indexViewModel.loginViewModel
-                                          .userLogin!.field13,
-                                      viewModel.currentUser!.field13),
+                                    viewModel.indexViewModel.loginViewModel
+                                        .userLogin!.field13,
+                                    viewModel.currentUser!.field13,
+                                  ),
                                   _buildFieldRow(
-                                      viewModel.indexViewModel.loginViewModel
-                                          .userLogin!.field14,
-                                      viewModel.currentUser!.field14),
+                                    viewModel.indexViewModel.loginViewModel
+                                        .userLogin!.field14,
+                                    viewModel.currentUser!.field14,
+                                  ),
                                   _buildFieldRow(
-                                      viewModel.indexViewModel.loginViewModel
-                                          .userLogin!.field15,
-                                      viewModel.currentUser!.field15),
+                                    viewModel.indexViewModel.loginViewModel
+                                        .userLogin!.field15,
+                                    viewModel.currentUser!.field15,
+                                  ),
                                 ] else ...[
                                   Text(
                                     "",
@@ -330,88 +358,90 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
                               color: AppColor.successQRCode,
                               size: 50,
                             )
-                          : Container(
-                              child: Column(
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: _onContinuePressed,
-                                    style: ButtonStyle(
-                                      padding: MaterialStateProperty.all(
-                                          const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 36)),
-                                      backgroundColor:
-                                          MaterialStateProperty.resolveWith(
-                                              (states) {
+                          : Column(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: _onContinuePressed,
+                                  style: ButtonStyle(
+                                    padding: MaterialStateProperty.all(
+                                      const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                        horizontal: 36,
+                                      ),
+                                    ),
+                                    backgroundColor:
+                                        MaterialStateProperty.resolveWith(
+                                      (states) {
                                         if (states
                                             .contains(MaterialState.pressed)) {
-                                          return Colors.greenAccent
-                                              .shade400; // Màu khi nhấn
+                                          return Colors.greenAccent.shade400;
                                         }
-                                        return AppColor
-                                            .successQRCode; // Màu mặc định
-                                      }),
-                                      shape: MaterialStateProperty.all(
-                                        RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                      ),
-                                      elevation: MaterialStateProperty.all(10),
+                                        return AppColor.successQRCode;
+                                      },
                                     ),
-                                    child: Text(
-                                      "TIẾP TỤC CHECK IN",
-                                      style: TextStyle(
-                                        fontSize: AppFontSize.sizeMedium,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                    shape: MaterialStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
                                       ),
+                                    ),
+                                    elevation: MaterialStateProperty.all(10),
+                                  ),
+                                  child: Text(
+                                    "TIẾP TỤC CHECK IN",
+                                    style: TextStyle(
+                                      fontSize: buttonFontSize,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
                                     ),
                                   ),
-                                  SizedBox(height: 20),
-                                  ElevatedButton(
-                                    onPressed: _onContinuePressedHistory,
-                                    style: ButtonStyle(
-                                      padding: MaterialStateProperty.all(
-                                          const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 18)),
-                                      backgroundColor:
-                                          MaterialStateProperty.resolveWith(
-                                              (states) {
+                                ),
+                                const SizedBox(height: 20),
+                                ElevatedButton(
+                                  onPressed: _onContinuePressedHistory,
+                                  style: ButtonStyle(
+                                    padding: MaterialStateProperty.all(
+                                      const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                        horizontal: 18,
+                                      ),
+                                    ),
+                                    backgroundColor:
+                                        MaterialStateProperty.resolveWith(
+                                      (states) {
                                         if (states
                                             .contains(MaterialState.pressed)) {
-                                          return Colors
-                                              .red.shade400; // Màu khi nhấn
+                                          return Colors.red.shade400;
                                         }
-                                        return AppColor
-                                            .primaryColor; // Màu mặc định
-                                      }),
-                                      shape: MaterialStateProperty.all(
-                                        RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                      ),
-                                      elevation: MaterialStateProperty.all(10),
+                                        return AppColor.primaryColor;
+                                      },
                                     ),
-                                    child: Text(
-                                      "QUAY LẠI DANH SÁCH",
-                                      style: TextStyle(
-                                        fontSize: AppFontSize.sizeMedium,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                    shape: MaterialStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
                                       ),
+                                    ),
+                                    elevation: MaterialStateProperty.all(10),
+                                  ),
+                                  child: Text(
+                                    "QUAY LẠI DANH SÁCH",
+                                    style: TextStyle(
+                                      fontSize: buttonFontSize,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                     ],
                   ),
                 ),
               ),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
   // Hàm để xây dựng dòng cho các field
@@ -437,7 +467,7 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
         SizedBox(height: 8),
         if (userField != null && userField.isNotEmpty) ...[
           Container(
-            width: MediaQuery.of(context).size.width * 0.9,
+            width: double.infinity,
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
               border: Border.all(

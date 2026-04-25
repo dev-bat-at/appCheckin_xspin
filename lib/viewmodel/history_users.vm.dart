@@ -188,6 +188,28 @@ class UsersViewModel extends BaseViewModel {
     }
   }
 
+  Future<void> reloadUsers() async {
+    resetPagination();
+    if (selectedStatus == 'all') {
+      await Future.wait([
+        getUsers(),
+        getCountUserJoin(''),
+        getSumUserJoin(),
+        getCountUser(),
+        getCountUserCheckIn(),
+      ]);
+      return;
+    }
+
+    await Future.wait([
+      getUsersByStatus(selectedStatus),
+      getCountUserJoin(selectedStatus),
+      getSumUserJoin(),
+      getCountUser(),
+      getCountUserCheckIn(),
+    ]);
+  }
+
   void onSearchChanged(String query) {
     search.text = query;
     getUsers(); // Gọi lại getUsers với query mới

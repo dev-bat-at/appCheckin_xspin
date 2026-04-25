@@ -99,7 +99,7 @@ class _MenuPageState extends State<MenuPage> {
                             child: const Icon(
                               Icons.dashboard_customize_outlined,
                               color: Colors.white,
-                              size: 26,
+                              size: 18,
                             ),
                           ),
                           const SizedBox(width: 14),
@@ -113,14 +113,6 @@ class _MenuPageState extends State<MenuPage> {
                                     color: Colors.white,
                                     fontWeight: FontWeight.w800,
                                     fontSize: 18,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Quản lý nhanh thông tin sự kiện, line check-in và các tác vụ chính.',
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.86),
-                                    height: 1.35,
                                   ),
                                 ),
                               ],
@@ -204,7 +196,6 @@ class _MenuPageState extends State<MenuPage> {
                 _MenuCard(
                   icon: Icons.info_outline,
                   title: 'Thông tin sự kiện',
-                  subtitle: 'Xem thông tin sự kiện và số lượt check-in',
                   accentColor: AppColor.primaryColor,
                   backgroundColor: Colors.white,
                   onTap: () {
@@ -221,8 +212,7 @@ class _MenuPageState extends State<MenuPage> {
                 ),
                 _MenuCard(
                   icon: Icons.query_stats,
-                  title: 'Báo cáo số lượt check-in',
-                  subtitle: 'Xem tổng quan và chi tiết theo nhóm',
+                  title: 'Thống kê',
                   accentColor: const Color(0xFFE58A2C),
                   backgroundColor: const Color(0xFFFFF8EF),
                   onTap: () {
@@ -236,8 +226,7 @@ class _MenuPageState extends State<MenuPage> {
                 ),
                 _MenuCard(
                   icon: Icons.qr_code_scanner_outlined,
-                  title: 'Checkin tự động',
-                  subtitle: 'Quet bang camera truoc va tu dong quay lai',
+                  title: 'Check-in tự động',
                   accentColor: const Color(0xFF127A67),
                   backgroundColor: const Color(0xFFF1FBF8),
                   onTap: () {
@@ -278,7 +267,6 @@ class _MenuPageState extends State<MenuPage> {
                 _MenuCard(
                   icon: Icons.logout,
                   title: 'Đăng xuất',
-                  subtitle: 'Thoát khỏi tài khoản hiện tại',
                   accentColor: Colors.redAccent,
                   backgroundColor: const Color(0xFFFFF3F2),
                   onTap: () => widget.loginViewModel.showLogOut(context),
@@ -296,15 +284,15 @@ class _MenuCard extends StatelessWidget {
   const _MenuCard({
     required this.icon,
     required this.title,
-    required this.subtitle,
     required this.onTap,
     required this.accentColor,
     required this.backgroundColor,
+    this.subtitle,
   });
 
   final IconData icon;
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final VoidCallback onTap;
   final Color accentColor;
   final Color backgroundColor;
@@ -343,16 +331,19 @@ class _MenuCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(fontWeight: FontWeight.w800),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w800, fontSize: 16),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        height: 1.35,
+                    if (subtitle != null && subtitle!.trim().isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        subtitle!,
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          height: 1.35,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),

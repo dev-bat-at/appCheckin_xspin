@@ -209,7 +209,7 @@ class _LineSelectionPageState extends State<LineSelectionPage> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Chọn line phù hợp để hệ thống gửi đúng quầy khi check-in QR.',
+                              'Bạn vui lòng chọn line check-in phù hợp',
                               style: TextStyle(
                                 fontSize: AppFontSize.sizeSmall,
                                 color: Colors.white.withValues(alpha: 0.88),

@@ -20,14 +20,25 @@ class StatisticSummary {
     required bool isSingleCheckin,
   }) {
     int parseInt(dynamic value) => int.tryParse(value?.toString() ?? '0') ?? 0;
+    int firstAvailable(List<String> keys) {
+      for (final key in keys) {
+        if (json.containsKey(key) && json[key] != null) {
+          return parseInt(json[key]);
+        }
+      }
+      return 0;
+    }
 
     return StatisticSummary(
       tongNguoiThamDu: parseInt(json['TongNguoiThamDu']),
-      daCheckin: isSingleCheckin ? 0 : parseInt(json['DaCheckin']),
-      chuaCheckin: isSingleCheckin ? 0 : parseInt(json['ChuaCheckin']),
-      daCheckinXong: isSingleCheckin ? parseInt(json['DaCheckinXong']) : 0,
-      dangCheckin: isSingleCheckin ? parseInt(json['DangCheckin']) : 0,
-      chuaTungCheckin: isSingleCheckin ? parseInt(json['ChuaTungCheckin']) : 0,
+      daCheckin: isSingleCheckin ? firstAvailable(['DaCheckin']) : 0,
+      chuaCheckin: isSingleCheckin ? firstAvailable(['ChuaCheckin']) : 0,
+      daCheckinXong:
+          isSingleCheckin ? 0 : firstAvailable(['DaCheckinXong', 'DaCheckin']),
+      dangCheckin: isSingleCheckin ? 0 : firstAvailable(['DangCheckin']),
+      chuaTungCheckin: isSingleCheckin
+          ? 0
+          : firstAvailable(['ChuaTungCheckin', 'ChuaCheckin']),
     );
   }
 }

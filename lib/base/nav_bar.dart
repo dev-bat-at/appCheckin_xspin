@@ -34,7 +34,13 @@ class _HomeNavigationBarState extends State<HomeNavigationBar> {
         backgroundColor: AppColor.extraColor,
         currentIndex: widget.currentIndex,
         fixedColor: AppColor.primaryColor,
-        unselectedItemColor: Colors.grey[600],
+        unselectedItemColor: AppColor.darkColor,
+        selectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w800,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w800,
+        ),
         onTap: (index) async {
           await widget.onTabSelected(index);
         },

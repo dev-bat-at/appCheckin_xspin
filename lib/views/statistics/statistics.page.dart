@@ -34,7 +34,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
         final summary = overview?.thongKe;
 
         return BasePage(
-          title: 'Báo Cáo Check-in',
+          title: 'Thống kê',
           showLogo: true,
           body: Container(
             decoration: const BoxDecoration(
@@ -60,89 +60,85 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   : ListView(
                       padding: const EdgeInsets.all(16),
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(18),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColor.primaryColor,
-                                deepRose,
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColor.primaryColor
-                                    .withValues(alpha: 0.16),
-                                blurRadius: 18,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Tổng quan sự kiện',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 20,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Thống kê theo ${viewModel.isSingleCheckin ? 'check-in 1 lần' : 'nhiều lượt check-in'} cho sự kiện ${AppSP.get(AppSPKey.tenTK) ?? ''}.',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.88),
-                                  height: 1.4,
-                                ),
-                              ),
-                              if ((AppSP.get(AppSPKey.tenLineCheckin) ?? '')
-                                  .isNotEmpty) ...[
-                                const SizedBox(height: 14),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 10,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.12),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.alt_route_rounded,
-                                        color: Colors.white,
-                                        size: 18,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          'Line hiện tại: ${AppSP.get(AppSPKey.tenLineCheckin) ?? ''}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 18),
+                        // Container(
+                        //   padding: const EdgeInsets.all(18),
+                        //   decoration: BoxDecoration(
+                        //     gradient: LinearGradient(
+                        //       colors: [
+                        //         AppColor.primaryColor,
+                        //         deepRose,
+                        //       ],
+                        //     ),
+                        //     borderRadius: BorderRadius.circular(24),
+                        //     boxShadow: [
+                        //       BoxShadow(
+                        //         color: AppColor.primaryColor
+                        //             .withValues(alpha: 0.16),
+                        //         blurRadius: 18,
+                        //         offset: const Offset(0, 10),
+                        //       ),
+                        //     ],
+                        //   ),
+                        //   child: Column(
+                        //     crossAxisAlignment: CrossAxisAlignment.start,
+                        //     children: [
+                        //       // const Text(
+                        //       //   'Tổng quan sự kiện',
+                        //       //   style: TextStyle(
+                        //       //     color: Colors.white,
+                        //       //     fontWeight: FontWeight.w800,
+                        //       //     fontSize: 20,
+                        //       //   ),
+                        //       // ),
+                        //       // const SizedBox(height: 8),
+                        //       // Text(
+                        //       //   'Thống kê theo ${viewModel.isSingleCheckin ? 'check-in 1 lần' : 'nhiều lượt check-in'} cho sự kiện ${AppSP.get(AppSPKey.tenTK) ?? ''}.',
+                        //       //   style: TextStyle(
+                        //       //     color: Colors.white.withValues(alpha: 0.88),
+                        //       //     height: 1.4,
+                        //       //   ),
+                        //       // ),
+                        //       // if ((AppSP.get(AppSPKey.tenLineCheckin) ?? '')
+                        //       //     .isNotEmpty) ...[
+                        //       //   const SizedBox(height: 14),
+                        //       //   Container(
+                        //       //     padding: const EdgeInsets.symmetric(
+                        //       //       horizontal: 12,
+                        //       //       vertical: 10,
+                        //       //     ),
+                        //       //     decoration: BoxDecoration(
+                        //       //       color: Colors.white.withValues(alpha: 0.12),
+                        //       //       borderRadius: BorderRadius.circular(16),
+                        //       //     ),
+                        //       //     child: Row(
+                        //       //       children: [
+                        //       //         const Icon(
+                        //       //           Icons.alt_route_rounded,
+                        //       //           color: Colors.white,
+                        //       //           size: 18,
+                        //       //         ),
+                        //       //         const SizedBox(width: 8),
+                        //       //         Expanded(
+                        //       //           child: Text(
+                        //       //             'Line hiện tại: ${AppSP.get(AppSPKey.tenLineCheckin) ?? ''}',
+                        //       //             style: const TextStyle(
+                        //       //               color: Colors.white,
+                        //       //               fontWeight: FontWeight.w700,
+                        //       //             ),
+                        //       //           ),
+                        //       //         ),
+                        //       //       ],
+                        //       //     ),
+                        //       //   ),
+                        //       // ],
+                        //     ],
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 18),
                         if (summary != null)
                           _StatisticMetricsCard(
                             summary: summary,
                             isSingleCheckin: viewModel.isSingleCheckin,
-                          )
-                        else
-                          const _EmptyState(
-                            message: 'Chưa có dữ liệu thống kê để hiển thị',
                           ),
                         const SizedBox(height: 16),
                         if (viewModel.groupedStatistics.isNotEmpty) ...[
@@ -154,11 +150,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                   isSingleCheckin: viewModel.isSingleCheckin,
                                 ),
                               ),
-                        ] else if (!viewModel.isBusy) ...[
-                          const _EmptyState(
-                            message: 'Chưa có nhóm thống kê chi tiết',
-                          ),
-                        ],
+                        ]
                       ],
                     ),
             ),
@@ -193,6 +185,23 @@ class _StatisticMetricsCard extends StatelessWidget {
               color: const Color(0xFFD8941A),
             ),
             _MetricTextData(
+              label: 'Đã check in',
+              value: summary.daCheckin,
+              color: const Color(0xFF17823B),
+            ),
+            _MetricTextData(
+              label: 'Chưa check-in',
+              value: summary.chuaCheckin,
+              color: const Color(0xFFD81B1B),
+            ),
+          ]
+        : <_MetricTextData>[
+            _MetricTextData(
+              label: 'Tổng người tham dự',
+              value: summary.tongNguoiThamDu,
+              color: const Color(0xFFD8941A),
+            ),
+            _MetricTextData(
               label: 'Đã check-in xong',
               value: summary.daCheckinXong,
               color: const Color(0xFF17823B),
@@ -205,23 +214,6 @@ class _StatisticMetricsCard extends StatelessWidget {
             _MetricTextData(
               label: 'Chưa từng check-in',
               value: summary.chuaTungCheckin,
-              color: const Color(0xFFD81B1B),
-            ),
-          ]
-        : <_MetricTextData>[
-            _MetricTextData(
-              label: 'Tổng người tham dự',
-              value: summary.tongNguoiThamDu,
-              color: const Color(0xFFD8941A),
-            ),
-            _MetricTextData(
-              label: 'Đã check in',
-              value: summary.daCheckin,
-              color: const Color(0xFF17823B),
-            ),
-            _MetricTextData(
-              label: 'Chưa check in',
-              value: summary.chuaCheckin,
               color: const Color(0xFFD81B1B),
             ),
           ];
