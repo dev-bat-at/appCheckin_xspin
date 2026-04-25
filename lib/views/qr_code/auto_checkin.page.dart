@@ -6,6 +6,7 @@ import 'dart:ui';
 
 import 'package:checkin/app/app_route_observer.dart';
 import 'package:checkin/constants/app_color.dart';
+import 'package:checkin/constants/app_fontsize.dart';
 import 'package:checkin/viewmodel/index.vm.dart';
 import 'package:checkin/viewmodel/login.vm.dart';
 import 'package:checkin/viewmodel/qr_code.vm.dart';
@@ -29,6 +30,7 @@ class AutoCheckinPage extends StatefulWidget {
 class _AutoCheckinPageState extends State<AutoCheckinPage>
     with WidgetsBindingObserver, RouteAware {
   final QRCodeViewModel _qrViewModel = QRCodeViewModel();
+  final TextEditingController _demoQRCodeController = TextEditingController();
   ModalRoute<dynamic>? _route;
 
   @override
@@ -68,6 +70,7 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
     }
     _qrViewModel.unbindScannerPage();
     unawaited(_qrViewModel.disposeScanner());
+    _demoQRCodeController.dispose();
     super.dispose();
   }
 
@@ -141,6 +144,22 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
     }
   }
 
+  Future<void> _submitDemoQRCode(QRCodeViewModel viewModel) async {
+    final qrCode = _demoQRCodeController.text.trim();
+    if (qrCode.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng nhập mã QR demo')),
+      );
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
+    await viewModel.runDemoCheckIn(
+      qrCode,
+      flowMode: QRCodeFlowMode.automatic,
+    );
+  }
+
   Future<void> _handleDetection(
     BarcodeCapture capture, {
     required Rect scanWindow,
@@ -189,6 +208,9 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
       },
       builder: (context, viewModel, child) {
         viewModel.bindScannerPage(context);
+        final mediaQuery = MediaQuery.of(context);
+        final isTablet = mediaQuery.size.shortestSide >= 600;
+        final bottomInset = mediaQuery.viewInsets.bottom;
 
         return Scaffold(
           backgroundColor: Colors.black,
@@ -198,9 +220,10 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
             builder: (context, loginViewModel, child) {
               return LayoutBuilder(
                 builder: (context, constraints) {
+                  final maxScanSize = isTablet ? 420.0 : 320.0;
                   final scanSize = math.min(
                     constraints.maxWidth * 0.76,
-                    320.0,
+                    maxScanSize,
                   );
                   final scanWindow = Rect.fromCenter(
                     center: Offset(
@@ -281,6 +304,17 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
                           ),
                         ),
                       ),
+                      // Positioned(
+                      //   left: 16,
+                      //   right: 16,
+                      //   bottom: bottomInset + 18,
+                      //   child: _AutoDemoQRCodeInput(
+                      //     controller: _demoQRCodeController,
+                      //     isBusy: viewModel.isBusy,
+                      //     isTablet: isTablet,
+                      //     onSubmitted: () => _submitDemoQRCode(viewModel),
+                      //   ),
+                      // ),
                     ],
                   );
                 },
@@ -292,6 +326,94 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
     );
   }
 }
+
+// class _AutoDemoQRCodeInput extends StatelessWidget {
+//   const _AutoDemoQRCodeInput({
+//     required this.controller,
+//     required this.isBusy,
+//     required this.isTablet,
+//     required this.onSubmitted,
+//   });
+
+//   final TextEditingController controller;
+//   final bool isBusy;
+//   final bool isTablet;
+//   final VoidCallback onSubmitted;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Center(
+//       child: ConstrainedBox(
+//         constraints: BoxConstraints(maxWidth: isTablet ? 620 : double.infinity),
+//         child: Material(
+//           color: Colors.black.withValues(alpha: 0.64),
+//           borderRadius: BorderRadius.circular(16),
+//           child: Padding(
+//             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+//             child: Row(
+//               children: [
+//                 // Expanded(
+//                 //   child: TextField(
+//                 //     controller: controller,
+//                 //     enabled: !isBusy,
+//                 //     keyboardType: TextInputType.number,
+//                 //     textInputAction: TextInputAction.done,
+//                 //     onSubmitted: (_) => onSubmitted(),
+//                 //     style: const TextStyle(color: Colors.white),
+//                 //     decoration: InputDecoration(
+//                 //       isDense: true,
+//                 //       hintText: 'Nhập mã QR demo',
+//                 //       hintStyle: TextStyle(
+//                 //         color: Colors.white.withValues(alpha: 0.76),
+//                 //       ),
+//                 //       prefixIcon: const Icon(
+//                 //         Icons.qr_code_2_rounded,
+//                 //         color: Colors.white,
+//                 //       ),
+//                 //       filled: true,
+//                 //       fillColor: Colors.white.withValues(alpha: 0.12),
+//                 //       border: OutlineInputBorder(
+//                 //         borderRadius: BorderRadius.circular(12),
+//                 //         borderSide: BorderSide.none,
+//                 //       ),
+//                 //       contentPadding: const EdgeInsets.symmetric(
+//                 //         horizontal: 12,
+//                 //         vertical: 12,
+//                 //       ),
+//                 //     ),
+//                 //   ),
+//                 // ),
+//                 const SizedBox(width: 10),
+//                 ElevatedButton(
+//                   onPressed: isBusy ? null : onSubmitted,
+//                   style: ElevatedButton.styleFrom(
+//                     backgroundColor: AppColor.successQRCode,
+//                     foregroundColor: Colors.white,
+//                     disabledBackgroundColor: Colors.grey.shade500,
+//                     padding: const EdgeInsets.symmetric(
+//                       horizontal: 18,
+//                       vertical: 13,
+//                     ),
+//                     shape: RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.circular(12),
+//                     ),
+//                   ),
+//                   child: Text(
+//                     isBusy ? 'Đang gửi' : 'Demo',
+//                     style: TextStyle(
+//                       fontSize: AppFontSize.sizeSmall,
+//                       fontWeight: FontWeight.w800,
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class _ScanGuideFrame extends StatelessWidget {
   const _ScanGuideFrame({
@@ -360,15 +482,36 @@ class _AutoCheckinBackgroundLayer extends StatelessWidget {
           if (hasBackgroundImage)
             ClipPath(
               clipper: _InvertedCutoutClipper(cutoutRect),
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  image: DecorationImage(
-                    image: backgroundImage,
-                    fit: BoxFit.cover,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ImageFiltered(
+                    imageFilter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        image: DecorationImage(
+                          image: backgroundImage,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      child: const SizedBox.expand(),
+                    ),
                   ),
-                ),
-                child: const SizedBox.expand(),
+                  ColoredBox(
+                    color: Colors.black.withValues(alpha: 0.16),
+                  ),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: backgroundImage,
+                        fit: BoxFit.contain,
+                        alignment: Alignment.center,
+                      ),
+                    ),
+                    child: const SizedBox.expand(),
+                  ),
+                ],
               ),
             ),
           if (!hasBackgroundImage)

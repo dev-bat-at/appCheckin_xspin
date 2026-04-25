@@ -1,5 +1,6 @@
 import 'package:checkin/app/app_sp.dart';
 import 'package:checkin/app/app_sp_key.dart';
+import 'package:checkin/constants/app_fontsize.dart';
 import 'package:flutter/material.dart';
 import 'package:checkin/constants/app_color.dart';
 
@@ -19,12 +20,20 @@ class HomeNavigationBar extends StatefulWidget {
 class _HomeNavigationBarState extends State<HomeNavigationBar> {
   @override
   Widget build(BuildContext context) {
+    final isTablet = MediaQuery.sizeOf(context).shortestSide >= 600;
+    final selectedFontSize = isTablet ? (AppFontSize.sizeSmall ?? 16) : 14.0;
+    final unselectedFontSize = isTablet ? (AppFontSize.sizeSmall ?? 16) : 12.0;
+    final sideIconSize = isTablet ? 30.0 : 24.0;
+    final qrIconSize = isTablet ? 38.0 : 30.0;
+    final qrPadding = isTablet ? 10.0 : 8.0;
+
     return Container(
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-            color: Colors.transparent
-                .withOpacity(0.1), // Hoặc màu mong muốn cho gạch ngang
+            color: Colors.transparent.withValues(
+              alpha: 0.1,
+            ), // Hoặc màu mong muốn cho gạch ngang
             width: 1.0, // Độ rộng của gạch ngang
           ),
         ),
@@ -35,10 +44,16 @@ class _HomeNavigationBarState extends State<HomeNavigationBar> {
         currentIndex: widget.currentIndex,
         fixedColor: AppColor.primaryColor,
         unselectedItemColor: AppColor.darkColor,
-        selectedLabelStyle: const TextStyle(
+        selectedFontSize: selectedFontSize,
+        unselectedFontSize: unselectedFontSize,
+        selectedIconTheme: IconThemeData(size: sideIconSize),
+        unselectedIconTheme: IconThemeData(size: sideIconSize),
+        selectedLabelStyle: TextStyle(
+          fontSize: selectedFontSize,
           fontWeight: FontWeight.w800,
         ),
-        unselectedLabelStyle: const TextStyle(
+        unselectedLabelStyle: TextStyle(
+          fontSize: unselectedFontSize,
           fontWeight: FontWeight.w800,
         ),
         onTap: (index) async {
@@ -46,7 +61,7 @@ class _HomeNavigationBarState extends State<HomeNavigationBar> {
         },
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.person, size: 24),
+            icon: Icon(Icons.person, size: sideIconSize),
             label: AppSP.get(AppSPKey.loaiCheckin) == 'NL'
                 ? 'Người tham dự'
                 : 'Người tham dự',
@@ -57,19 +72,19 @@ class _HomeNavigationBarState extends State<HomeNavigationBar> {
                 color: AppColor.selectColor,
                 shape: BoxShape.circle,
               ),
-              padding: EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(qrPadding),
               child: Center(
                 child: Icon(
                   Icons.qr_code,
                   color: Colors.white, // Màu của icon
-                  size: 30.0, // Kích thước icon
+                  size: qrIconSize, // Kích thước icon
                 ),
               ),
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.menu_rounded, size: 24),
+            icon: Icon(Icons.menu_rounded, size: sideIconSize),
             label: 'Danh mục',
           ),
         ],

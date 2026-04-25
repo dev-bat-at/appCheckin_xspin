@@ -203,6 +203,26 @@ class QRCodeViewModel extends BaseViewModel {
     );
   }
 
+  Future<void> runDemoCheckIn(
+    String maQR, {
+    QRCodeFlowMode flowMode = QRCodeFlowMode.manual,
+  }) async {
+    final demoQRCode = maQR.trim();
+    if (demoQRCode.isEmpty || isBusy || isScanQr) {
+      return;
+    }
+
+    isScanQr = true;
+    currentQRCode = demoQRCode;
+    await stopScannerSafely();
+
+    try {
+      await getUsers(flowMode: flowMode);
+    } finally {
+      isScanQr = false;
+    }
+  }
+
   Users _mergeUserData({
     required Users originalUser,
     Users? checkedInUser,

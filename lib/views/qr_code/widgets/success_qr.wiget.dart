@@ -186,8 +186,11 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
     return ViewModelBuilder.reactive(
       disposeViewModel: false,
       viewModelBuilder: () => widget.qrCodeViewModel,
-      onViewModelReady: (viewModel) async {
-        Future.microtask(() async {
+      onViewModelReady: (viewModel) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          if (!mounted) {
+            return;
+          }
           await viewModel.indexViewModel.loginViewModel.loadUser();
         });
       },
@@ -363,28 +366,28 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
                                 ElevatedButton(
                                   onPressed: _onContinuePressed,
                                   style: ButtonStyle(
-                                    padding: MaterialStateProperty.all(
+                                    padding: WidgetStateProperty.all(
                                       const EdgeInsets.symmetric(
                                         vertical: 10,
                                         horizontal: 36,
                                       ),
                                     ),
                                     backgroundColor:
-                                        MaterialStateProperty.resolveWith(
+                                        WidgetStateProperty.resolveWith(
                                       (states) {
                                         if (states
-                                            .contains(MaterialState.pressed)) {
+                                            .contains(WidgetState.pressed)) {
                                           return Colors.greenAccent.shade400;
                                         }
                                         return AppColor.successQRCode;
                                       },
                                     ),
-                                    shape: MaterialStateProperty.all(
+                                    shape: WidgetStateProperty.all(
                                       RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(15),
                                       ),
                                     ),
-                                    elevation: MaterialStateProperty.all(10),
+                                    elevation: WidgetStateProperty.all(10),
                                   ),
                                   child: Text(
                                     "TIẾP TỤC CHECK IN",
@@ -399,28 +402,28 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
                                 ElevatedButton(
                                   onPressed: _onContinuePressedHistory,
                                   style: ButtonStyle(
-                                    padding: MaterialStateProperty.all(
+                                    padding: WidgetStateProperty.all(
                                       const EdgeInsets.symmetric(
                                         vertical: 10,
                                         horizontal: 18,
                                       ),
                                     ),
                                     backgroundColor:
-                                        MaterialStateProperty.resolveWith(
+                                        WidgetStateProperty.resolveWith(
                                       (states) {
                                         if (states
-                                            .contains(MaterialState.pressed)) {
+                                            .contains(WidgetState.pressed)) {
                                           return Colors.red.shade400;
                                         }
                                         return AppColor.primaryColor;
                                       },
                                     ),
-                                    shape: MaterialStateProperty.all(
+                                    shape: WidgetStateProperty.all(
                                       RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(15),
                                       ),
                                     ),
-                                    elevation: MaterialStateProperty.all(10),
+                                    elevation: WidgetStateProperty.all(10),
                                   ),
                                   child: Text(
                                     "QUAY LẠI DANH SÁCH",

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:checkin/app/app_sp.dart';
 import 'package:checkin/app/app_sp_key.dart';
 import 'package:checkin/constants/app_color.dart';
+import 'package:checkin/constants/app_fontsize.dart';
 import 'package:checkin/model/login.model.dart';
 import 'package:checkin/model/user.model.dart';
 import 'package:checkin/viewmodel/qr_code.vm.dart';
@@ -74,9 +75,15 @@ class _AutoCheckinResultPageState extends State<AutoCheckinResultPage> {
     final horizontalPadding = isTablet ? 40.0 : 20.0;
     final cardPadding = isTablet ? 28.0 : 20.0;
     final maxCardWidth = isTablet ? 620.0 : double.infinity;
-    final titleFontSize = isTablet ? 28.0 : 24.0;
-    final messageFontSize = isTablet ? 16.0 : 14.0;
-    final footerFontSize = isTablet ? 15.0 : 14.0;
+    final titleFontSize = isTablet
+        ? (AppFontSize.sizeSuperLarge ?? 32)
+        : (AppFontSize.sizeLarge ?? 24);
+    final messageFontSize = isTablet
+        ? (AppFontSize.sizeSmall ?? 16)
+        : (AppFontSize.sizeSuperSmall ?? 14);
+    final footerFontSize = isTablet
+        ? (AppFontSize.sizeSmall ?? 16)
+        : (AppFontSize.sizeSuperSmall ?? 14);
     final iconBoxSize = isTablet ? 104.0 : 88.0;
     final iconSize = isTablet ? 60.0 : 52.0;
 
@@ -307,7 +314,8 @@ class _AutoInfoTile extends StatelessWidget {
             label,
             style: TextStyle(
               color: accentColor,
-              fontSize: isTablet ? 15 : 14,
+              fontSize:
+                  isTablet ? AppFontSize.sizeSmall : AppFontSize.sizeSuperSmall,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -316,7 +324,8 @@ class _AutoInfoTile extends StatelessWidget {
             value,
             style: TextStyle(
               color: Colors.green,
-              fontSize: isTablet ? 18 : 16,
+              fontSize:
+                  isTablet ? AppFontSize.sizeTable : AppFontSize.sizeSmall,
               fontWeight: FontWeight.w600,
               height: 1.35,
             ),
