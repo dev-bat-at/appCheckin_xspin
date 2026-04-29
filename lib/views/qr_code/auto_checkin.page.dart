@@ -282,15 +282,6 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
                                 child: Ink(
                                   width: 42,
                                   height: 42,
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withValues(alpha: 0.42),
-                                    borderRadius: BorderRadius.circular(18),
-                                    border: Border.all(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.14,
-                                      ),
-                                    ),
-                                  ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(9),
                                     child: Image.asset(

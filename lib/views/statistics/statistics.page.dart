@@ -1,5 +1,3 @@
-import 'package:checkin/app/app_sp.dart';
-import 'package:checkin/app/app_sp_key.dart';
 import 'package:checkin/base/base_page.dart';
 import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/model/statistics.model.dart';
@@ -21,7 +19,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
   @override
   Widget build(BuildContext context) {
     const background = Color(0xFFF8F3F1);
-    const deepRose = Color(0xFF7A1621);
 
     return ViewModelBuilder<StatisticsViewModel>.reactive(
       disposeViewModel: false,
@@ -150,7 +147,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                   isSingleCheckin: viewModel.isSingleCheckin,
                                 ),
                               ),
-                        ]
+                        ],
                       ],
                     ),
             ),
@@ -218,66 +215,166 @@ class _StatisticMetricsCard extends StatelessWidget {
             ),
           ];
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade300),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 700;
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade300),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 10,
+                offset: const Offset(0, 5),
+              ),
+            ],
           ),
-        ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (hasTitle) ...[
+                Text(
+                  index == null ? title!.trim() : '$index. ${title!.trim()}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 18,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 10),
+              ],
+              if (isTablet)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: metrics
+                      .asMap()
+                      .entries
+                      .map<Widget>(
+                        (entry) => Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              right: entry.key == metrics.length - 1 ? 0 : 12,
+                            ),
+                            child: _TabletMetricItem(
+                              metric: entry.value,
+                              emphasize: !hasTitle,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                )
+              else
+                Column(
+                  children: metrics
+                      .asMap()
+                      .entries
+                      .map<Widget>(
+                        (entry) => Padding(
+                          padding: EdgeInsets.only(
+                            bottom: entry.key == metrics.length - 1 ? 0 : 12,
+                          ),
+                          child: _PhoneMetricItem(
+                            metric: entry.value,
+                            emphasize: !hasTitle,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _TabletMetricItem extends StatelessWidget {
+  const _TabletMetricItem({
+    required this.metric,
+    required this.emphasize,
+  });
+
+  final _MetricTextData metric;
+  final bool emphasize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          metric.label,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: metric.color,
+            fontWeight: FontWeight.w700,
+            fontSize: emphasize ? 16 : 15,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          '${metric.value}',
+          maxLines: 1,
+          overflow: TextOverflow.visible,
+          softWrap: false,
+          style: TextStyle(
+            color: metric.color,
+            fontWeight: FontWeight.w800,
+            fontSize: emphasize ? 24 : 22,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PhoneMetricItem extends StatelessWidget {
+  const _PhoneMetricItem({
+    required this.metric,
+    required this.emphasize,
+  });
+
+  final _MetricTextData metric;
+  final bool emphasize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          if (hasTitle) ...[
-            Text(
-              index == null ? title!.trim() : '$index. ${title!.trim()}',
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 18,
-                color: Colors.black87,
+          Expanded(
+            child: Text(
+              metric.label,
+              style: TextStyle(
+                color: metric.color,
+                fontWeight: FontWeight.w700,
+                fontSize: emphasize ? 15 : 14,
               ),
             ),
-            const SizedBox(height: 10),
-          ],
-          Wrap(
-            spacing: 18,
-            runSpacing: 10,
-            alignment: hasTitle ? WrapAlignment.start : WrapAlignment.center,
-            children: metrics
-                .map<Widget>(
-                  (metric) => RichText(
-                    text: TextSpan(
-                      style: DefaultTextStyle.of(context).style,
-                      children: [
-                        TextSpan(
-                          text: '${metric.label}: ',
-                          style: TextStyle(
-                            color: metric.color,
-                            fontWeight: FontWeight.w700,
-                            fontSize: hasTitle ? 16 : 17,
-                          ),
-                        ),
-                        TextSpan(
-                          text: '${metric.value}',
-                          style: TextStyle(
-                            color: metric.color,
-                            fontWeight: FontWeight.w800,
-                            fontSize: hasTitle ? 16 : 17,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-                .toList(),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            '${metric.value}',
+            maxLines: 1,
+            softWrap: false,
+            style: TextStyle(
+              color: metric.color,
+              fontWeight: FontWeight.w800,
+              fontSize: emphasize ? 20 : 18,
+            ),
           ),
         ],
       ),

@@ -15,6 +15,32 @@ class StatisticSummary {
     this.chuaTungCheckin = 0,
   });
 
+  const StatisticSummary.empty()
+      : tongNguoiThamDu = 0,
+        daCheckin = 0,
+        chuaCheckin = 0,
+        daCheckinXong = 0,
+        dangCheckin = 0,
+        chuaTungCheckin = 0;
+
+  StatisticSummary operator +(StatisticSummary other) {
+    return StatisticSummary(
+      tongNguoiThamDu: tongNguoiThamDu + other.tongNguoiThamDu,
+      daCheckin: daCheckin + other.daCheckin,
+      chuaCheckin: chuaCheckin + other.chuaCheckin,
+      daCheckinXong: daCheckinXong + other.daCheckinXong,
+      dangCheckin: dangCheckin + other.dangCheckin,
+      chuaTungCheckin: chuaTungCheckin + other.chuaTungCheckin,
+    );
+  }
+
+  factory StatisticSummary.sum(Iterable<StatisticSummary> items) {
+    return items.fold(
+      const StatisticSummary.empty(),
+      (total, item) => total + item,
+    );
+  }
+
   factory StatisticSummary.fromJson(
     Map<String, dynamic> json, {
     required bool isSingleCheckin,
