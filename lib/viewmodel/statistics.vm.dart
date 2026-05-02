@@ -30,16 +30,16 @@ class StatisticsViewModel extends BaseViewModel {
         growable: false,
       );
 
-      if (groupedStatistics.isNotEmpty) {
-        overview = StatisticGroup(
-          nhomThongKe: '',
-          thongKe: StatisticSummary.sum(
-            groupedStatistics.map((item) => item.thongKe),
-          ),
-        );
-      } else {
-        overview = null;
-      }
+      // if (groupedStatistics.isNotEmpty) {
+      //   overview = StatisticGroup(
+      //     nhomThongKe: '',
+      //     thongKe: StatisticSummary.sum(
+      //       groupedStatistics.map((item) => item.thongKe),
+      //     ),
+      //   );
+      // } else {
+      //   overview = null;
+      // }
     } finally {
       setBusy(false);
       notifyListeners();

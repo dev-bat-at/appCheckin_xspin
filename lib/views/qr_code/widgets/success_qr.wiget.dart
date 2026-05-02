@@ -11,8 +11,15 @@ import 'package:stacked/stacked.dart';
 
 class SuccessScreenQR extends StatefulWidget {
   final QRCodeViewModel qrCodeViewModel;
+  final bool autoClose;
+  final Duration autoCloseDuration;
 
-  SuccessScreenQR({super.key, required this.qrCodeViewModel});
+  const SuccessScreenQR({
+    super.key,
+    required this.qrCodeViewModel,
+    this.autoClose = false,
+    this.autoCloseDuration = const Duration(milliseconds: 2500),
+  });
 
   @override
   State<SuccessScreenQR> createState() => _SuccessScreenQRState();
@@ -21,6 +28,28 @@ class SuccessScreenQR extends StatefulWidget {
 class _SuccessScreenQRState extends State<SuccessScreenQR> {
   bool _isLoading = false; // Trạng thái đang tải
   String? errorMessage; // Thông báo lỗi nếu có
+  Timer? _dismissTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.autoClose) {
+      _dismissTimer = Timer(widget.autoCloseDuration, _closeIfMounted);
+    }
+  }
+
+  @override
+  void dispose() {
+    _dismissTimer?.cancel();
+    super.dispose();
+  }
+
+  void _closeIfMounted() {
+    if (!mounted) {
+      return;
+    }
+    Navigator.maybePop(context);
+  }
 
   Future<void> _onContinuePressed() async {
     setState(() {
@@ -356,86 +385,97 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
                               ],
                             ),
                       const SizedBox(height: 30),
-                      _isLoading
-                          ? LoadingAnimationWidget.threeRotatingDots(
-                              color: AppColor.successQRCode,
-                              size: 50,
-                            )
-                          : Column(
-                              children: [
-                                ElevatedButton(
-                                  onPressed: _onContinuePressed,
-                                  style: ButtonStyle(
-                                    padding: WidgetStateProperty.all(
-                                      const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                        horizontal: 36,
-                                      ),
-                                    ),
-                                    backgroundColor:
-                                        WidgetStateProperty.resolveWith(
-                                      (states) {
-                                        if (states
-                                            .contains(WidgetState.pressed)) {
-                                          return Colors.greenAccent.shade400;
-                                        }
-                                        return AppColor.successQRCode;
-                                      },
-                                    ),
-                                    shape: WidgetStateProperty.all(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                    ),
-                                    elevation: WidgetStateProperty.all(10),
-                                  ),
-                                  child: Text(
-                                    "TIẾP TỤC CHECK IN",
-                                    style: TextStyle(
-                                      fontSize: buttonFontSize,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
+                      if (widget.autoClose)
+                        Text(
+                          'Tự động đóng sau giây lát...',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: isTablet
+                                ? (AppFontSize.sizeSmall ?? 16)
+                                : (AppFontSize.sizeSuperSmall ?? 14),
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey[600],
+                          ),
+                        )
+                      else if (_isLoading)
+                        LoadingAnimationWidget.threeRotatingDots(
+                          color: AppColor.successQRCode,
+                          size: 50,
+                        )
+                      else
+                        Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: _onContinuePressed,
+                              style: ButtonStyle(
+                                padding: WidgetStateProperty.all(
+                                  const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 36,
                                   ),
                                 ),
-                                const SizedBox(height: 20),
-                                ElevatedButton(
-                                  onPressed: _onContinuePressedHistory,
-                                  style: ButtonStyle(
-                                    padding: WidgetStateProperty.all(
-                                      const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                        horizontal: 18,
-                                      ),
-                                    ),
-                                    backgroundColor:
-                                        WidgetStateProperty.resolveWith(
-                                      (states) {
-                                        if (states
-                                            .contains(WidgetState.pressed)) {
-                                          return Colors.red.shade400;
-                                        }
-                                        return AppColor.primaryColor;
-                                      },
-                                    ),
-                                    shape: WidgetStateProperty.all(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                    ),
-                                    elevation: WidgetStateProperty.all(10),
-                                  ),
-                                  child: Text(
-                                    "QUAY LẠI DANH SÁCH",
-                                    style: TextStyle(
-                                      fontSize: buttonFontSize,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
+                                backgroundColor:
+                                    WidgetStateProperty.resolveWith(
+                                  (states) {
+                                    if (states.contains(WidgetState.pressed)) {
+                                      return Colors.greenAccent.shade400;
+                                    }
+                                    return AppColor.successQRCode;
+                                  },
+                                ),
+                                shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
                                   ),
                                 ),
-                              ],
+                                elevation: WidgetStateProperty.all(10),
+                              ),
+                              child: Text(
+                                "TIẾP TỤC CHECK IN",
+                                style: TextStyle(
+                                  fontSize: buttonFontSize,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
+                            const SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: _onContinuePressedHistory,
+                              style: ButtonStyle(
+                                padding: WidgetStateProperty.all(
+                                  const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 18,
+                                  ),
+                                ),
+                                backgroundColor:
+                                    WidgetStateProperty.resolveWith(
+                                  (states) {
+                                    if (states.contains(WidgetState.pressed)) {
+                                      return Colors.red.shade400;
+                                    }
+                                    return AppColor.primaryColor;
+                                  },
+                                ),
+                                shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                ),
+                                elevation: WidgetStateProperty.all(10),
+                              ),
+                              child: Text(
+                                "QUAY LẠI DANH SÁCH",
+                                style: TextStyle(
+                                  fontSize: buttonFontSize,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                     ],
                   ),
                 ),

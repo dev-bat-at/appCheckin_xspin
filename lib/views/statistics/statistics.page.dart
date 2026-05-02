@@ -16,6 +16,15 @@ class StatisticsPage extends StatefulWidget {
 class _StatisticsPageState extends State<StatisticsPage> {
   final StatisticsViewModel _viewModel = StatisticsViewModel();
 
+  // void _openTabletDemo() {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => const StatisticsTabletDemoPage(),
+  //     ),
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
     const background = Color(0xFFF8F3F1);
@@ -27,6 +36,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
         await viewModel.loadStatistics();
       },
       builder: (context, viewModel, child) {
+        final mediaQuery = MediaQuery.of(context);
+        final isTablet = mediaQuery.size.shortestSide >= 600;
+        final listPadding = EdgeInsets.symmetric(
+          horizontal: isTablet ? 24 : 16,
+          vertical: isTablet ? 20 : 16,
+        );
         final overview = viewModel.overview;
         final summary = overview?.thongKe;
 
@@ -55,8 +70,32 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       ),
                     )
                   : ListView(
-                      padding: const EdgeInsets.all(16),
+                      padding: listPadding,
                       children: [
+                        // Align(
+                        //   alignment: Alignment.centerRight,
+                        //   child: OutlinedButton.icon(
+                        //     onPressed: _openTabletDemo,
+                        //     icon: const Icon(Icons.tablet_mac_outlined),
+                        //     label: const Text('Demo tablet'),
+                        //     style: OutlinedButton.styleFrom(
+                        //       foregroundColor: AppColor.primaryColor,
+                        //       side: BorderSide(
+                        //         color: AppColor.primaryColor.withValues(
+                        //           alpha: 0.35,
+                        //         ),
+                        //       ),
+                        //       padding: EdgeInsets.symmetric(
+                        //         horizontal: isTablet ? 18 : 14,
+                        //         vertical: 12,
+                        //       ),
+                        //       backgroundColor: Colors.white.withValues(
+                        //         alpha: 0.92,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                        // SizedBox(height: isTablet ? 18 : 14),
                         // Container(
                         //   padding: const EdgeInsets.all(18),
                         //   decoration: BoxDecoration(
@@ -217,14 +256,21 @@ class _StatisticMetricsCard extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isTablet = constraints.maxWidth >= 700;
+        final isTablet = constraints.maxWidth >= 600;
+        final isSmallTablet =
+            constraints.maxWidth >= 600 && constraints.maxWidth < 900;
+        final contentMaxWidth =
+            isTablet ? (isSmallTablet ? 420.0 : 480.0) : null;
 
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: isTablet ? (isSmallTablet ? 24 : 28) : 18,
+            vertical: isTablet ? (isSmallTablet ? 22 : 24) : 16,
+          ),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
             border: Border.all(color: Colors.grey.shade300),
             boxShadow: [
               BoxShadow(
@@ -240,34 +286,39 @@ class _StatisticMetricsCard extends StatelessWidget {
               if (hasTitle) ...[
                 Text(
                   index == null ? title!.trim() : '$index. ${title!.trim()}',
-                  style: const TextStyle(
+                  textAlign: isTablet ? TextAlign.center : TextAlign.start,
+                  style: TextStyle(
                     fontWeight: FontWeight.w800,
-                    fontSize: 18,
+                    fontSize: isTablet ? (isSmallTablet ? 22 : 24) : 18,
                     color: Colors.black87,
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: isTablet ? 16 : 10),
               ],
               if (isTablet)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: metrics
-                      .asMap()
-                      .entries
-                      .map<Widget>(
-                        (entry) => Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              right: entry.key == metrics.length - 1 ? 0 : 12,
+                Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: contentMaxWidth!),
+                    child: Column(
+                      children: metrics
+                          .asMap()
+                          .entries
+                          .map<Widget>(
+                            (entry) => Padding(
+                              padding: EdgeInsets.only(
+                                bottom:
+                                    entry.key == metrics.length - 1 ? 0 : 14,
+                              ),
+                              child: _TabletMetricItem(
+                                metric: entry.value,
+                                emphasize: !hasTitle,
+                                isSmallTablet: isSmallTablet,
+                              ),
                             ),
-                            child: _TabletMetricItem(
-                              metric: entry.value,
-                              emphasize: !hasTitle,
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList(),
+                          )
+                          .toList(),
+                    ),
+                  ),
                 )
               else
                 Column(
@@ -299,39 +350,55 @@ class _TabletMetricItem extends StatelessWidget {
   const _TabletMetricItem({
     required this.metric,
     required this.emphasize,
+    required this.isSmallTablet,
   });
 
   final _MetricTextData metric;
   final bool emphasize;
+  final bool isSmallTablet;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          metric.label,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: metric.color,
-            fontWeight: FontWeight.w700,
-            fontSize: emphasize ? 16 : 15,
-          ),
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        horizontal: isSmallTablet ? 18 : 20,
+        vertical: isSmallTablet ? 18 : 20,
+      ),
+      decoration: BoxDecoration(
+        color: metric.color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: metric.color.withValues(alpha: 0.18),
         ),
-        const SizedBox(height: 6),
-        Text(
-          '${metric.value}',
-          maxLines: 1,
-          overflow: TextOverflow.visible,
-          softWrap: false,
-          style: TextStyle(
-            color: metric.color,
-            fontWeight: FontWeight.w800,
-            fontSize: emphasize ? 24 : 22,
+      ),
+      child: Column(
+        children: [
+          Text(
+            metric.label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: metric.color,
+              fontWeight: FontWeight.w700,
+              fontSize: emphasize
+                  ? (isSmallTablet ? 18 : 19)
+                  : (isSmallTablet ? 17 : 18),
+            ),
           ),
-        ),
-      ],
+          SizedBox(height: isSmallTablet ? 10 : 12),
+          Text(
+            '${metric.value}',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: metric.color,
+              fontWeight: FontWeight.w900,
+              fontSize: emphasize
+                  ? (isSmallTablet ? 34 : 36)
+                  : (isSmallTablet ? 30 : 32),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -374,41 +441,6 @@ class _PhoneMetricItem extends StatelessWidget {
               color: metric.color,
               fontWeight: FontWeight.w800,
               fontSize: emphasize ? 20 : 18,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  const _EmptyState({
-    required this.message,
-  });
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.insights_outlined, color: Colors.grey[600]),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              message,
-              style: TextStyle(
-                color: Colors.grey[700],
-                fontWeight: FontWeight.w600,
-              ),
             ),
           ),
         ],

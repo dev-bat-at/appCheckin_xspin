@@ -9,21 +9,48 @@ class FailedQrCode extends StatefulWidget {
   final QRCodeViewModel qrCodeViewModel;
   final String title;
   final String desc;
-  FailedQrCode(
-      {super.key,
-      required this.qrCodeViewModel,
-      required this.title,
-      required this.desc});
+  final bool autoClose;
+  final Duration autoCloseDuration;
+
+  const FailedQrCode({
+    super.key,
+    required this.qrCodeViewModel,
+    required this.title,
+    required this.desc,
+    this.autoClose = false,
+    this.autoCloseDuration = const Duration(milliseconds: 2500),
+  });
 
   @override
   State<FailedQrCode> createState() => _FailedQrCodeState();
 }
 
 class _FailedQrCodeState extends State<FailedQrCode> {
-  Future<void> _onContinuePressed() async {
-    if (mounted) {
-      Navigator.maybePop(context);
+  Timer? _dismissTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.autoClose) {
+      _dismissTimer = Timer(widget.autoCloseDuration, _closeIfMounted);
     }
+  }
+
+  @override
+  void dispose() {
+    _dismissTimer?.cancel();
+    super.dispose();
+  }
+
+  void _closeIfMounted() {
+    if (!mounted) {
+      return;
+    }
+    Navigator.maybePop(context);
+  }
+
+  Future<void> _onContinuePressed() async {
+    _closeIfMounted();
   }
 
   @override
@@ -53,7 +80,7 @@ class _FailedQrCodeState extends State<FailedQrCode> {
                   Icon(
                     Icons.error_outline,
                     size: isTablet ? 92 : 80,
-                    color: AppColor.primaryColor.withOpacity(0.8),
+                    color: AppColor.primaryColor.withValues(alpha: 0.8),
                   ),
                   SizedBox(height: isTablet ? 24 : 20),
                   // Title
@@ -80,63 +107,76 @@ class _FailedQrCodeState extends State<FailedQrCode> {
                           ? (AppFontSize.sizeMedium ?? 20) + 2
                           : (AppFontSize.sizeMedium ?? 20),
                       fontWeight: FontWeight.w500,
-                      color: AppColor.primaryColor.withOpacity(0.7),
+                      color: AppColor.primaryColor.withValues(alpha: 0.7),
                       height: 1.5, // Improve readability
                     ),
                   ),
                   SizedBox(height: isTablet ? 48 : 40),
                   // Continue Button
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColor.primaryColor,
-                          AppColor.primaryColor.withOpacity(0.8),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                  if (widget.autoClose)
+                    Text(
+                      'Tự động đóng sau giây lát...',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: isTablet
+                            ? (AppFontSize.sizeSmall ?? 16)
+                            : (AppFontSize.sizeSuperSmall ?? 14),
+                        fontStyle: FontStyle.italic,
+                        color: Colors.grey[600],
                       ),
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColor.primaryColor.withOpacity(0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
+                    )
+                  else
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColor.primaryColor,
+                            AppColor.primaryColor.withValues(alpha: 0.8),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                      ],
-                    ),
-                    child: ElevatedButton(
-                      onPressed: _onContinuePressed,
-                      style: ButtonStyle(
-                        padding: MaterialStateProperty.all(
-                          const EdgeInsets.symmetric(
-                              vertical: 14, horizontal: 40),
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColor.primaryColor.withValues(alpha: 0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: _onContinuePressed,
+                        style: ButtonStyle(
+                          padding: WidgetStateProperty.all(
+                            const EdgeInsets.symmetric(
+                                vertical: 14, horizontal: 40),
+                          ),
+                          backgroundColor:
+                              WidgetStateProperty.all(Colors.transparent),
+                          foregroundColor:
+                              WidgetStateProperty.all(Colors.white),
+                          shape: WidgetStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                          elevation: WidgetStateProperty.all(
+                              0), // Elevation handled by boxShadow
                         ),
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.transparent),
-                        foregroundColor:
-                            MaterialStateProperty.all(Colors.white),
-                        shape: MaterialStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
+                        child: Text(
+                          "TIẾP TỤC CHECK IN",
+                          style: TextStyle(
+                            fontSize: isTablet
+                                ? (AppFontSize.sizeMedium ?? 20) + 1
+                                : (AppFontSize.sizeMedium ?? 20),
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: 1.0,
                           ),
                         ),
-                        elevation: MaterialStateProperty.all(
-                            0), // Elevation handled by boxShadow
-                      ),
-                      child: Text(
-                        "TIẾP TỤC CHECK IN",
-                        style: TextStyle(
-                          fontSize: isTablet
-                              ? (AppFontSize.sizeMedium ?? 20) + 1
-                              : (AppFontSize.sizeMedium ?? 20),
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          letterSpacing: 1.0,
-                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),

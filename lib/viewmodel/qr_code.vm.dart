@@ -10,7 +10,6 @@ import 'package:checkin/model/user.model.dart';
 import 'package:checkin/requests/history_user.requets.dart';
 import 'package:checkin/requests/qrcode.request.dart';
 import 'package:checkin/viewmodel/index.vm.dart';
-import 'package:checkin/views/qr_code/widgets/auto_checkin_result.page.dart';
 import 'package:checkin/views/qr_code/widgets/success_qr.wiget.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:stacked/stacked.dart';
@@ -306,9 +305,9 @@ class QRCodeViewModel extends BaseViewModel {
           unawaited(refreshCheckinData());
           await _playSuccessSound();
           if (flowMode == QRCodeFlowMode.automatic) {
-            showAutomaticResult(isSuccess: true);
+            await showAutomaticResult(isSuccess: true);
           } else {
-            showSuccessScanQrCode();
+            await showSuccessScanQrCode();
           }
         } else {
           setBusy(false);
@@ -318,12 +317,12 @@ class QRCodeViewModel extends BaseViewModel {
               ? 'Mã QR $qrCode đã hết lượt check-in!'
               : 'Mã QR $qrCode đã được check-in rồi!';
           if (flowMode == QRCodeFlowMode.automatic) {
-            showAutomaticResult(
+            await showAutomaticResult(
               isSuccess: false,
               description: desc,
             );
           } else {
-            _showResultPage(
+            await _showResultPage(
               FailedQrCode(
                 qrCodeViewModel: this,
                 title: 'Thông báo',
@@ -337,12 +336,12 @@ class QRCodeViewModel extends BaseViewModel {
         notifyListeners();
         await _playErrorSound();
         if (flowMode == QRCodeFlowMode.automatic) {
-          showAutomaticResult(
+          await showAutomaticResult(
             isSuccess: false,
             description: 'Mã QR Code không tồn tại',
           );
         } else {
-          _showResultPage(
+          await _showResultPage(
             FailedQrCode(
               qrCodeViewModel: this,
               title: 'Thông báo',
@@ -363,12 +362,12 @@ class QRCodeViewModel extends BaseViewModel {
       notifyListeners();
       await _playErrorSound();
       if (flowMode == QRCodeFlowMode.automatic) {
-        showAutomaticResult(
+        await showAutomaticResult(
           isSuccess: false,
           description: errorMessage,
         );
       } else {
-        _showResultPage(
+        await _showResultPage(
           FailedQrCode(
             qrCodeViewModel: this,
             title: 'Thông báo',
@@ -393,12 +392,11 @@ class QRCodeViewModel extends BaseViewModel {
       MaterialPageRoute(builder: (context) => page),
     );
 
-    if (!restartScannerAfterClose ||
-        !_isScannerPageActive ||
-        !viewContext.mounted) {
+    if (!restartScannerAfterClose || !viewContext.mounted) {
       return;
     }
 
+    bindScannerPage(viewContext);
     await Future<void>.delayed(const Duration(milliseconds: 120));
     await startScannerSafely();
   }
@@ -413,11 +411,17 @@ class QRCodeViewModel extends BaseViewModel {
     String? description,
   }) async {
     await _showResultPage(
-      AutoCheckinResultPage(
-        qrCodeViewModel: this,
-        isSuccess: isSuccess,
-        description: description,
-      ),
+      isSuccess
+          ? SuccessScreenQR(
+              qrCodeViewModel: this,
+              autoClose: true,
+            )
+          : FailedQrCode(
+              qrCodeViewModel: this,
+              title: 'Thông báo',
+              desc: description ?? 'Vui lòng thử lại với mã QR khác.',
+              autoClose: true,
+            ),
       restartScannerAfterClose: true,
     );
   }
