@@ -289,36 +289,27 @@ class _StatisticMetricsCard extends StatelessWidget {
                   textAlign: isTablet ? TextAlign.center : TextAlign.start,
                   style: TextStyle(
                     fontWeight: FontWeight.w800,
-                    fontSize: isTablet ? (isSmallTablet ? 22 : 24) : 18,
+                    fontSize: isTablet ? (isSmallTablet ? 22 : 20) : 18,
                     color: Colors.black87,
                   ),
                 ),
                 SizedBox(height: isTablet ? 16 : 10),
               ],
               if (isTablet)
-                Center(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: contentMaxWidth!),
-                    child: Column(
-                      children: metrics
-                          .asMap()
-                          .entries
-                          .map<Widget>(
-                            (entry) => Padding(
-                              padding: EdgeInsets.only(
-                                bottom:
-                                    entry.key == metrics.length - 1 ? 0 : 14,
-                              ),
-                              child: _TabletMetricItem(
-                                metric: entry.value,
-                                emphasize: !hasTitle,
-                                isSmallTablet: isSmallTablet,
-                              ),
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ),
+                Row(
+                  children: metrics
+                      .asMap()
+                      .entries
+                      .map<Widget>(
+                        (entry) => Expanded(
+                          child: _TabletMetricItem(
+                            metric: entry.value,
+                            emphasize: !hasTitle,
+                            isSmallTablet: isSmallTablet,
+                          ),
+                        ),
+                      )
+                      .toList(),
                 )
               else
                 Column(
@@ -359,46 +350,29 @@ class _TabletMetricItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        horizontal: isSmallTablet ? 18 : 20,
-        vertical: isSmallTablet ? 18 : 20,
-      ),
-      decoration: BoxDecoration(
-        color: metric.color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: metric.color.withValues(alpha: 0.18),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          metric.label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: metric.color,
+            fontWeight: FontWeight.w600,
+            fontSize: emphasize ? 16 : 15,
+          ),
         ),
-      ),
-      child: Column(
-        children: [
-          Text(
-            metric.label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: metric.color,
-              fontWeight: FontWeight.w700,
-              fontSize: emphasize
-                  ? (isSmallTablet ? 18 : 19)
-                  : (isSmallTablet ? 17 : 18),
-            ),
+        const SizedBox(height: 6),
+        Text(
+          '${metric.value}',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: metric.color,
+            fontWeight: FontWeight.w700,
+            fontSize: emphasize ? 28 : 22,
           ),
-          SizedBox(height: isSmallTablet ? 10 : 12),
-          Text(
-            '${metric.value}',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: metric.color,
-              fontWeight: FontWeight.w900,
-              fontSize: emphasize
-                  ? (isSmallTablet ? 34 : 36)
-                  : (isSmallTablet ? 30 : 32),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
