@@ -351,8 +351,7 @@ class QRCodeViewModel extends BaseViewModel {
         }
       }
     } catch (e) {
-      String errorMessage =
-          'Có lỗi xảy ra, vui lòng kiểm tra lại kết nối internet hoặc Mã QrCode không tồn tại!';
+      String errorMessage = 'QR Code không hợp lệ!';
       if (e.toString().contains('Lỗi kết nối internet')) {
         errorMessage =
             'Lỗi kết nối internet. Vui lòng kiểm tra Wi-Fi hoặc dữ liệu di động.';

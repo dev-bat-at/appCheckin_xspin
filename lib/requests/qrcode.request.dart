@@ -69,8 +69,7 @@ class QRCodeRequest {
       }
     } catch (e) {
       print('GetUser error: $e');
-      throw Exception(
-          'Có lỗi xảy ra, vui lòng kiểm tra lại kết nối internet hoặc Mã QrCode không tồn tại!');
+      throw Exception('QR Code không hợp lệ!');
     }
   }
 }

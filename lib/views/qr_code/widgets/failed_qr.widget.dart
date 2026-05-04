@@ -115,7 +115,7 @@ class _FailedQrCodeState extends State<FailedQrCode> {
                   // Continue Button
                   if (widget.autoClose)
                     Text(
-                      'Tự động đóng sau giây lát...',
+                      'Tự động đóng sau 3 giây....',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: isTablet
