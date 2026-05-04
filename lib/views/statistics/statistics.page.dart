@@ -289,7 +289,7 @@ class _StatisticMetricsCard extends StatelessWidget {
                   textAlign: isTablet ? TextAlign.center : TextAlign.start,
                   style: TextStyle(
                     fontWeight: FontWeight.w800,
-                    fontSize: isTablet ? (isSmallTablet ? 22 : 20) : 18,
+                    fontSize: isTablet ? (isSmallTablet ? 20 : 18) : 18,
                     color: Colors.black87,
                   ),
                 ),
@@ -319,7 +319,7 @@ class _StatisticMetricsCard extends StatelessWidget {
                       .map<Widget>(
                         (entry) => Padding(
                           padding: EdgeInsets.only(
-                            bottom: entry.key == metrics.length - 1 ? 0 : 12,
+                            bottom: entry.key == metrics.length - 1 ? 0 : 0,
                           ),
                           child: _PhoneMetricItem(
                             metric: entry.value,
@@ -359,7 +359,7 @@ class _TabletMetricItem extends StatelessWidget {
           style: TextStyle(
             color: metric.color,
             fontWeight: FontWeight.w600,
-            fontSize: emphasize ? 16 : 15,
+            fontSize: emphasize ? 16 : 14,
           ),
         ),
         const SizedBox(height: 6),
@@ -369,7 +369,7 @@ class _TabletMetricItem extends StatelessWidget {
           style: TextStyle(
             color: metric.color,
             fontWeight: FontWeight.w700,
-            fontSize: emphasize ? 28 : 22,
+            fontSize: emphasize ? 18 : 16,
           ),
         ),
       ],
@@ -390,7 +390,7 @@ class _PhoneMetricItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -414,7 +414,7 @@ class _PhoneMetricItem extends StatelessWidget {
             style: TextStyle(
               color: metric.color,
               fontWeight: FontWeight.w800,
-              fontSize: emphasize ? 20 : 18,
+              fontSize: emphasize ? 18 : 16,
             ),
           ),
         ],
