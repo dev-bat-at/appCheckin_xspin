@@ -4,10 +4,49 @@ import 'package:checkin/model/user.model.dart';
 import 'package:checkin/services/api_services.dart';
 import 'dart:async'; // Để sử dụng TimeoutException
 
+class QRCodeCheckInResult {
+  const QRCodeCheckInResult({
+    required this.status,
+    this.user,
+    this.message,
+  });
+
+  final int status;
+  final Users? user;
+  final String? message;
+}
+
 class QRCodeRequest {
   final Dio dio = Dio();
 
-  Future<Users?> checkIn(
+  int? _parseStatus(dynamic value) {
+    if (value is int) {
+      return value;
+    }
+    if (value is String) {
+      return int.tryParse(value.trim());
+    }
+    return null;
+  }
+
+  String? _parseMessage(Map<String, dynamic> data) {
+    final message = data['Messege'] ?? data['Message'];
+    if (message is String) {
+      final trimmedMessage = message.trim();
+      if (trimmedMessage.isNotEmpty) {
+        return trimmedMessage;
+      }
+    }
+    return null;
+  }
+
+  bool _looksLikeUserPayload(Map<String, dynamic> data) {
+    return data.containsKey('MaThamDu') ||
+        data.containsKey('idNguoiThamDu') ||
+        data.containsKey('Field2');
+  }
+
+  Future<QRCodeCheckInResult> checkIn(
       {required String idSuKien,
       required String maQR,
       String? idLineCheckin}) async {
@@ -23,22 +62,34 @@ class QRCodeRequest {
         throw TimeoutException(
             'Yêu cầu mất quá nhiều thời gian, kiểm tra kết nối mạng.');
       });
+      print('Check-in response statusCode: ${response.statusCode}');
+      print('Check-in response data: ${response.data}');
       if (response.statusCode == 200) {
         final data = response.data;
-        print(response.data['Status']);
-        if (data["Status"] == 1) {
-          print('Check-in thành công: ${data['Status']}');
-          return Users.fromJson(data);
-        } else if (data["Status"] == 2) {
-          print('Đã checkin: ${data['Status']}');
-          return null;
-        } else {
-          print('Check-in không thành công: ${data['Status']}');
-          return null;
+        if (data is! Map<String, dynamic>) {
+          return const QRCodeCheckInResult(status: 0);
         }
+
+        final status = _parseStatus(data['Status']) ?? 0;
+        final message = _parseMessage(data);
+        print(data['Status']);
+        if (status == 1) {
+          print('Check-in thành công: ${data['Status']}');
+          return QRCodeCheckInResult(
+            status: status,
+            user: Users.fromJson(data),
+            message: message,
+          );
+        }
+
+        print('Check-in không thành công: ${data['Status']}');
+        return QRCodeCheckInResult(
+          status: status,
+          message: message,
+        );
       } else {
         print('Check-in failed: ${response.statusCode}');
-        return null;
+        throw Exception('Check-in failed: HTTP ${response.statusCode}');
       }
     } catch (e) {
       print('Check-in error: $e');
@@ -55,13 +106,27 @@ class QRCodeRequest {
     try {
       final response = await ApiService()
           .getUsers('${Api.hostApi}${Api.infoUser}', queryParameters: body);
+      print('GetUser response statusCode: ${response.statusCode}');
+      print('GetUser response data: ${response.data}');
       if (response.statusCode == 200) {
         final data = response.data;
-        print('status data: ${data['Status']}');
         if (data == "Error") {
           print("User không tồn tại");
           return null; // Mã QR không tồn tại
         }
+        if (data is! Map<String, dynamic>) {
+          return null;
+        }
+
+        print('status data: ${data['Status']}');
+        final status = _parseStatus(data['Status']);
+        if (status != null && status <= 0) {
+          throw Exception(_parseMessage(data) ?? 'QR Code không hợp lệ!');
+        }
+        if (!_looksLikeUserPayload(data)) {
+          throw Exception(_parseMessage(data) ?? 'QR Code không hợp lệ!');
+        }
+
         final qrCodeResponse = Users.fromJson(data);
         return qrCodeResponse;
       } else {

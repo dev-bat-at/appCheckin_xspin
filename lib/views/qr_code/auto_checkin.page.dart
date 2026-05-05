@@ -6,7 +6,6 @@ import 'dart:ui';
 
 import 'package:checkin/app/app_route_observer.dart';
 import 'package:checkin/constants/app_color.dart';
-import 'package:checkin/constants/app_fontsize.dart';
 import 'package:checkin/viewmodel/index.vm.dart';
 import 'package:checkin/viewmodel/login.vm.dart';
 import 'package:checkin/viewmodel/qr_code.vm.dart';
@@ -114,6 +113,20 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
     await _qrViewModel.startScannerSafely();
   }
 
+  void _scheduleScannerWarmup() {
+    for (final delay in const [
+      Duration(milliseconds: 250),
+      Duration(milliseconds: 700),
+    ]) {
+      Future<void>.delayed(delay, () {
+        if (!mounted) {
+          return;
+        }
+        unawaited(_resumeScannerIfVisible());
+      });
+    }
+  }
+
   CameraFacing _resolveCameraFacing(String? cameraSetting) {
     switch (cameraSetting?.trim()) {
       case 'CameraSau':
@@ -144,22 +157,6 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
     }
   }
 
-  Future<void> _submitDemoQRCode(QRCodeViewModel viewModel) async {
-    final qrCode = _demoQRCodeController.text.trim();
-    if (qrCode.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập mã QR demo')),
-      );
-      return;
-    }
-
-    FocusScope.of(context).unfocus();
-    await viewModel.runDemoCheckIn(
-      qrCode,
-      flowMode: QRCodeFlowMode.automatic,
-    );
-  }
-
   Future<void> _handleDetection(
     BarcodeCapture capture, {
     required Rect scanWindow,
@@ -176,6 +173,7 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
         widgetSize: previewSize,
         scanWindow: scanWindow,
         fit: BoxFit.cover,
+        mirrorHorizontally: _qrViewModel.isFrontCamera,
       );
     });
 
@@ -204,13 +202,13 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
         viewModel.bindScannerPage(context);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           unawaited(_resumeScannerIfVisible());
+          _scheduleScannerWarmup();
         });
       },
       builder: (context, viewModel, child) {
         viewModel.bindScannerPage(context);
         final mediaQuery = MediaQuery.of(context);
         final isTablet = mediaQuery.size.shortestSide >= 600;
-        final bottomInset = mediaQuery.viewInsets.bottom;
 
         return Scaffold(
           backgroundColor: Colors.black,

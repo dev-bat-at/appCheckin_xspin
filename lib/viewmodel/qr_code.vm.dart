@@ -98,19 +98,30 @@ class QRCodeViewModel extends BaseViewModel {
     }
   }
 
-  Future<void> startScannerSafely() async {
-    final controller = scannerController;
-    if (!_isScannerPageActive || controller == null) {
-      return;
-    }
-    if (controller.value.isRunning || controller.value.isStarting) {
-      return;
-    }
+  Future<void> startScannerSafely({int retryCount = 2}) async {
+    for (var attempt = 0; attempt <= retryCount; attempt++) {
+      final controller = scannerController;
+      if (!_isScannerPageActive || controller == null) {
+        return;
+      }
+      if (controller.value.isRunning) {
+        return;
+      }
 
-    try {
-      await controller.start();
-    } catch (e) {
-      debugPrint('Start scanner skipped: $e');
+      if (!controller.value.isStarting) {
+        try {
+          await controller.start();
+        } catch (e) {
+          debugPrint(
+            'Start scanner skipped on attempt ${attempt + 1}: $e',
+          );
+        }
+      }
+
+      await Future<void>.delayed(const Duration(milliseconds: 180));
+      if (controller.value.isRunning) {
+        return;
+      }
     }
   }
 
@@ -195,11 +206,12 @@ class QRCodeViewModel extends BaseViewModel {
   }
 
   Future<void> loadQrCode(String maQR) async {
-    currentUser = await qrCodeRequest.checkIn(
+    final result = await qrCodeRequest.checkIn(
       idSuKien: AppSP.get(AppSPKey.idSuKien),
       maQR: maQR,
       idLineCheckin: AppSP.get(AppSPKey.idLineCheckin),
     );
+    currentUser = result.user;
   }
 
   Future<void> runDemoCheckIn(
@@ -269,6 +281,58 @@ class QRCodeViewModel extends BaseViewModel {
     );
   }
 
+  String _normalizeErrorMessage(Object error) {
+    final rawMessage = error.toString().trim();
+    if (rawMessage.startsWith('Exception: ')) {
+      return rawMessage.substring('Exception: '.length).trim();
+    }
+    return rawMessage;
+  }
+
+  String _buildCheckInFailureMessage(
+    int status, {
+    String? serverMessage,
+  }) {
+    final normalizedServerMessage = serverMessage?.trim();
+    if (normalizedServerMessage != null && normalizedServerMessage.isNotEmpty) {
+      return normalizedServerMessage;
+    }
+
+    switch (status) {
+      case 0:
+        return 'QR Code không hợp lệ!';
+      case -1:
+      case -2:
+        return 'Check-in thất bại. Bạn vui lòng liên hệ admin để xử lý!!';
+      default:
+        return 'Check-in thất bại. Bạn vui lòng liên hệ admin để xử lý!!';
+    }
+  }
+
+  Future<void> _showFailedResult(
+    String description, {
+    required QRCodeFlowMode flowMode,
+  }) async {
+    setBusy(false);
+    notifyListeners();
+    await _playErrorSound();
+    if (flowMode == QRCodeFlowMode.automatic) {
+      await showAutomaticResult(
+        isSuccess: false,
+        description: description,
+      );
+      return;
+    }
+
+    await _showResultPage(
+      FailedQrCode(
+        qrCodeViewModel: this,
+        title: 'Thông báo',
+        desc: description,
+      ),
+    );
+  }
+
   Future<void> getUsers({
     QRCodeFlowMode flowMode = QRCodeFlowMode.manual,
   }) async {
@@ -278,6 +342,7 @@ class QRCodeViewModel extends BaseViewModel {
     }
 
     setBusy(true);
+    currentUser = null;
     print('Vô get');
     try {
       final userDetail = await qrCodeRequest.getUser(
@@ -291,89 +356,62 @@ class QRCodeViewModel extends BaseViewModel {
         final maxCheckinCount = userDetail.soLuotCheckIntoida ?? 1;
 
         if (checkedInCount < maxCheckinCount) {
-          final checkedInUser = await qrCodeRequest.checkIn(
+          final checkInResult = await qrCodeRequest.checkIn(
             idSuKien: AppSP.get(AppSPKey.idSuKien),
             maQR: qrCode,
             idLineCheckin: AppSP.get(AppSPKey.idLineCheckin),
           );
-          currentUser = _mergeUserData(
-            originalUser: userDetail,
-            checkedInUser: checkedInUser,
-          );
-          setBusy(false);
-          notifyListeners();
-          unawaited(refreshCheckinData());
-          await _playSuccessSound();
-          if (flowMode == QRCodeFlowMode.automatic) {
-            await showAutomaticResult(isSuccess: true);
+
+          if (checkInResult.status == 1) {
+            currentUser = _mergeUserData(
+              originalUser: userDetail,
+              checkedInUser: checkInResult.user,
+            );
+            setBusy(false);
+            notifyListeners();
+            unawaited(refreshCheckinData());
+            await _playSuccessSound();
+            if (flowMode == QRCodeFlowMode.automatic) {
+              await showAutomaticResult(isSuccess: true);
+            } else {
+              await showSuccessScanQrCode();
+            }
           } else {
-            await showSuccessScanQrCode();
+            currentUser = userDetail;
+            await _showFailedResult(
+              _buildCheckInFailureMessage(
+                checkInResult.status,
+                serverMessage: checkInResult.message,
+              ),
+              flowMode: flowMode,
+            );
           }
         } else {
-          setBusy(false);
-          notifyListeners();
-          await _playErrorSound();
           final desc = AppSP.get(AppSPKey.loaiCheckin) == 'NL'
               ? 'Mã QR $qrCode đã hết lượt check-in!'
               : 'Mã QR $qrCode đã được check-in rồi!';
-          if (flowMode == QRCodeFlowMode.automatic) {
-            await showAutomaticResult(
-              isSuccess: false,
-              description: desc,
-            );
-          } else {
-            await _showResultPage(
-              FailedQrCode(
-                qrCodeViewModel: this,
-                title: 'Thông báo',
-                desc: desc,
-              ),
-            );
-          }
+          await _showFailedResult(desc, flowMode: flowMode);
         }
       } else {
-        setBusy(false);
-        notifyListeners();
-        await _playErrorSound();
-        if (flowMode == QRCodeFlowMode.automatic) {
-          await showAutomaticResult(
-            isSuccess: false,
-            description: 'Mã QR Code không tồn tại',
-          );
-        } else {
-          await _showResultPage(
-            FailedQrCode(
-              qrCodeViewModel: this,
-              title: 'Thông báo',
-              desc: 'Mã QR Code không tồn tại',
-            ),
-          );
-        }
+        await _showFailedResult(
+          'QR Code không hợp lệ!',
+          flowMode: flowMode,
+        );
       }
     } catch (e) {
-      String errorMessage = 'QR Code không hợp lệ!';
-      if (e.toString().contains('Lỗi kết nối internet')) {
+      String errorMessage = _normalizeErrorMessage(e);
+      if (errorMessage.isEmpty) {
+        errorMessage = 'QR Code không hợp lệ!';
+      }
+      if (errorMessage.contains('Lỗi kết nối internet')) {
         errorMessage =
             'Lỗi kết nối internet. Vui lòng kiểm tra Wi-Fi hoặc dữ liệu di động.';
       }
 
-      setBusy(false);
-      notifyListeners();
-      await _playErrorSound();
-      if (flowMode == QRCodeFlowMode.automatic) {
-        await showAutomaticResult(
-          isSuccess: false,
-          description: errorMessage,
-        );
-      } else {
-        await _showResultPage(
-          FailedQrCode(
-            qrCodeViewModel: this,
-            title: 'Thông báo',
-            desc: errorMessage,
-          ),
-        );
-      }
+      await _showFailedResult(
+        errorMessage,
+        flowMode: flowMode,
+      );
     }
   }
 

@@ -229,7 +229,11 @@ class _MenuPageState extends State<MenuPage> {
                   title: 'Check-in tự động',
                   accentColor: const Color(0xFF127A67),
                   backgroundColor: const Color(0xFFF1FBF8),
-                  onTap: () {
+                  onTap: () async {
+                    await widget.loginViewModel.loadUser();
+                    if (!mounted) {
+                      return;
+                    }
                     Navigator.push(
                       context,
                       MaterialPageRoute(

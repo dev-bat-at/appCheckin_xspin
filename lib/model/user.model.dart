@@ -13,6 +13,29 @@ class CheckinHistory {
   }
 }
 
+int? _parseInt(dynamic value) {
+  if (value is int) {
+    return value;
+  }
+  if (value is String) {
+    return int.tryParse(value.trim());
+  }
+  return null;
+}
+
+bool _parseBool(dynamic value) {
+  if (value is bool) {
+    return value;
+  }
+  if (value is String) {
+    return value.toLowerCase() == 'true';
+  }
+  if (value is num) {
+    return value != 0;
+  }
+  return false;
+}
+
 class Users {
   String maQR;
   String? tenTinhTrang;
@@ -74,11 +97,11 @@ class Users {
     return Users(
         maQR: json['MaThamDu'] ?? '',
         idNguoiThamDu: json['idNguoiThamDu'] ?? '',
-        isCheckin: json['isCheckin'] == "True",
+        isCheckin: _parseBool(json['isCheckin']),
         thoiDiemCheckin: json['ThoiDiemCheckin'],
-        chuaCheckin: json['ChuaCheckin'] as int?,
-        dacheckIn: json['DaCheckin'] as int?,
-        soLuotCheckIntoida: json['SoLuotCheckinToiDa'] as int?,
+        chuaCheckin: _parseInt(json['ChuaCheckin']),
+        dacheckIn: _parseInt(json['DaCheckin']),
+        soLuotCheckIntoida: _parseInt(json['SoLuotCheckinToiDa']),
         field2: json['Field2'],
         field3: json['Field3'],
         field4: json['Field4'],
@@ -97,6 +120,8 @@ class Users {
                 ?.map((item) => CheckinHistory.fromJson(item))
                 .toList() ??
             [],
+        tenTinhTrang: json['TenTinhTrang'],
+        maTinhTrang: json['MaTinhTrang'],
         tinhTrang: json['TinhTrang'],
         ngayCheckin: json['NgayCheckin']);
   }

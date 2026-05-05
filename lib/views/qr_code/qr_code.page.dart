@@ -101,6 +101,20 @@ class _QrCodePageState extends State<QrCodePage>
     await widget.qrViewModel.startScannerSafely();
   }
 
+  void _scheduleScannerWarmup() {
+    for (final delay in const [
+      Duration(milliseconds: 250),
+      Duration(milliseconds: 700),
+    ]) {
+      Future<void>.delayed(delay, () {
+        if (!mounted) {
+          return;
+        }
+        unawaited(_resumeScannerIfVisible());
+      });
+    }
+  }
+
   Future<void> _submitDemoQRCode(QRCodeViewModel viewModel) async {
     final qrCode = _demoQRCodeController.text.trim();
     if (qrCode.isEmpty) {
@@ -124,6 +138,7 @@ class _QrCodePageState extends State<QrCodePage>
         viewModel.bindScannerPage(context);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           unawaited(_resumeScannerIfVisible());
+          _scheduleScannerWarmup();
         });
       },
       builder: (context, viewModel, child) {
@@ -185,8 +200,9 @@ class _QrCodePageState extends State<QrCodePage>
                                           .toList();
                                       for (final barcode in barcodes) {
                                         final String? rawValue =
-                                            barcode.rawValue;
-                                        if (rawValue != null) {
+                                            barcode.rawValue?.trim();
+                                        if (rawValue != null &&
+                                            rawValue.isNotEmpty) {
                                           viewModel.currentQRCode = rawValue;
                                           print('QR Code found: $rawValue');
                                           await viewModel.getUsers();

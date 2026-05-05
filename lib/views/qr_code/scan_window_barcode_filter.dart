@@ -9,6 +9,7 @@ bool isBarcodeInsideScanWindow({
   required Size widgetSize,
   required Rect scanWindow,
   BoxFit fit = BoxFit.cover,
+  bool mirrorHorizontally = false,
 }) {
   if (barcode.corners.length < 4 ||
       cameraPreviewSize.isEmpty ||
@@ -30,14 +31,18 @@ bool isBarcodeInsideScanWindow({
   final adjustedOffsets = barcode.corners
       .map(
         (offset) => Offset(
-          offset.dx * ratios.widthRatio - horizontalPadding,
+          _resolveHorizontalOffset(
+            offset.dx * ratios.widthRatio - horizontalPadding,
+            widgetWidth: widgetSize.width,
+            mirrorHorizontally: mirrorHorizontally,
+          ),
           offset.dy * ratios.heightRatio - verticalPadding,
         ),
       )
       .toList();
 
   final center = _polygonCenter(adjustedOffsets);
-  return scanWindow.contains(center);
+  return scanWindow.inflate(18).contains(center);
 }
 
 ({double widthRatio, double heightRatio}) _calculateBoxFitRatio({
@@ -90,4 +95,16 @@ Offset _polygonCenter(List<Offset> points) {
   }
 
   return Offset(dx / points.length, dy / points.length);
+}
+
+double _resolveHorizontalOffset(
+  double x, {
+  required double widgetWidth,
+  required bool mirrorHorizontally,
+}) {
+  if (!mirrorHorizontally) {
+    return x;
+  }
+
+  return widgetWidth - x;
 }

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:checkin/services/api_log_interceptor.dart';
 
 class ApiService {
   final Dio dio = Dio(BaseOptions(
@@ -10,6 +11,7 @@ class ApiService {
     dio.options.headers = {
       'Content-Type': 'application/json; charset=utf-8',
     };
+    dio.interceptors.add(ApiLogInterceptor());
   }
 
   Future<Response> _handleRedirect(Response response,

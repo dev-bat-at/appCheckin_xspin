@@ -36,7 +36,7 @@ class LoginViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  loadQrCode(String maQR) async {
+  Future<void> loadQrCode(String maQR) async {
     setBusy(true);
     userdata = await qrCodeRequest.getUser(
         idSuKien: AppSP.get(AppSPKey.idSuKien), maQR: maQR);
@@ -45,13 +45,14 @@ class LoginViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  loadUser() async {
+  Future<Login?> loadUser() async {
     setBusy(true);
     userLogin = await loginRequest.getUsers(
         tenSK: AppSP.get(AppSPKey.tenTK), mkSK: AppSP.get(AppSPKey.password));
 
     setBusy(false);
     notifyListeners();
+    return userLogin;
   }
 
   Future<void> showSignInSuccessDialog(

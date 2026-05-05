@@ -4,6 +4,7 @@ import 'package:checkin/app/app_sp.dart';
 import 'package:checkin/app/app_sp_key.dart';
 import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/constants/app_fontsize.dart';
+import 'package:checkin/viewmodel/login.vm.dart';
 import 'package:checkin/viewmodel/qr_code.vm.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -224,264 +225,261 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
         });
       },
       builder: (context, viewModel, child) {
-        final mediaQuery = MediaQuery.of(context);
-        final isTablet = mediaQuery.size.shortestSide >= 600;
-        final maxContentWidth = isTablet ? 620.0 : double.infinity;
-        final pagePadding = isTablet ? 32.0 : 20.0;
-        final titleFontSize = isTablet
-            ? (AppFontSize.sizeLarge ?? 24) + 4
-            : (AppFontSize.sizeLarge ?? 24);
-        final qrFontSize = isTablet
-            ? (AppFontSize.sizeSuperLarge ?? 32) + 2
-            : (AppFontSize.sizeSuperLarge ?? 32);
-        final buttonFontSize = isTablet
-            ? (AppFontSize.sizeMedium ?? 20) + 1
-            : (AppFontSize.sizeMedium ?? 20);
+        return ViewModelBuilder<LoginViewModel>.reactive(
+          disposeViewModel: false,
+          viewModelBuilder: () => viewModel.indexViewModel.loginViewModel,
+          builder: (context, loginViewModel, child) {
+            final mediaQuery = MediaQuery.of(context);
+            final isTablet = mediaQuery.size.shortestSide >= 600;
+            final maxContentWidth = isTablet ? 620.0 : double.infinity;
+            final pagePadding = isTablet ? 32.0 : 20.0;
+            final titleFontSize = isTablet
+                ? (AppFontSize.sizeLarge ?? 24) + 4
+                : (AppFontSize.sizeLarge ?? 24);
+            final qrFontSize = isTablet
+                ? (AppFontSize.sizeSuperLarge ?? 32) + 2
+                : (AppFontSize.sizeSuperLarge ?? 32);
+            final buttonFontSize = isTablet
+                ? (AppFontSize.sizeMedium ?? 20) + 1
+                : (AppFontSize.sizeMedium ?? 20);
+            final loginConfig = loginViewModel.userLogin;
 
-        return SafeArea(
-          child: Scaffold(
-            body: SingleChildScrollView(
-              padding: EdgeInsets.all(pagePadding),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: maxContentWidth),
-                  child: Column(
-                    children: [
-                      SizedBox(height: isTablet ? 28 : 20),
-                      viewModel.isBusy
-                          ? LoadingAnimationWidget.threeRotatingDots(
-                              color: AppColor.successQRCode,
-                              size: 50,
-                            )
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                if (viewModel.currentUser != null) ...[
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 10),
-                                    child: Text(
-                                      "Check-in thành công!",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: titleFontSize,
-                                        fontWeight: FontWeight.w900,
-                                        color: AppColor.successQRCode,
-                                      ),
-                                    ),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Mã QR:',
-                                        style: TextStyle(
-                                          fontSize: qrFontSize,
-                                          fontWeight: FontWeight.w900,
-                                          color: AppColor.successQRCode,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 15),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 5,
-                                          horizontal: 10,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: AppColor.successQRCode,
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
+            return SafeArea(
+              child: Scaffold(
+                body: SingleChildScrollView(
+                  padding: EdgeInsets.all(pagePadding),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: maxContentWidth),
+                      child: Column(
+                        children: [
+                          SizedBox(height: isTablet ? 28 : 20),
+                          viewModel.isBusy
+                              ? LoadingAnimationWidget.threeRotatingDots(
+                                  color: AppColor.successQRCode,
+                                  size: 50,
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    if (viewModel.currentUser != null) ...[
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 10),
                                         child: Text(
-                                          viewModel.currentUser!.maQR,
+                                          "Check-in thành công!",
+                                          textAlign: TextAlign.center,
                                           style: TextStyle(
-                                            fontSize: qrFontSize,
-                                            color: AppColor.extraColor,
+                                            fontSize: titleFontSize,
                                             fontWeight: FontWeight.w900,
+                                            color: AppColor.successQRCode,
                                           ),
                                         ),
                                       ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Mã QR:',
+                                            style: TextStyle(
+                                              fontSize: qrFontSize,
+                                              fontWeight: FontWeight.w900,
+                                              color: AppColor.successQRCode,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 15),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 5,
+                                              horizontal: 10,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColor.successQRCode,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              viewModel.currentUser!.maQR,
+                                              style: TextStyle(
+                                                fontSize: qrFontSize,
+                                                color: AppColor.extraColor,
+                                                fontWeight: FontWeight.w900,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 20),
+                                      _buildFieldRow(
+                                        loginConfig?.field2,
+                                        viewModel.currentUser!.field2,
+                                      ),
+                                      _buildFieldRow(
+                                        loginConfig?.field3,
+                                        viewModel.currentUser!.field3,
+                                      ),
+                                      _buildFieldRow(
+                                        loginConfig?.field4,
+                                        viewModel.currentUser!.field4,
+                                      ),
+                                      _buildFieldRow(
+                                        loginConfig?.field5,
+                                        viewModel.currentUser!.field5,
+                                      ),
+                                      _buildFieldRow(
+                                        loginConfig?.field6,
+                                        viewModel.currentUser!.field6,
+                                      ),
+                                      _buildFieldRow(
+                                        loginConfig?.field7,
+                                        viewModel.currentUser!.field7,
+                                      ),
+                                      _buildFieldRow(
+                                        loginConfig?.field8,
+                                        viewModel.currentUser!.field8,
+                                      ),
+                                      _buildFieldRow(
+                                        loginConfig?.field9,
+                                        viewModel.currentUser!.field9,
+                                      ),
+                                      _buildFieldRow(
+                                        loginConfig?.field10,
+                                        viewModel.currentUser!.field10,
+                                      ),
+                                      _buildFieldRow(
+                                        loginConfig?.field11,
+                                        viewModel.currentUser!.field11,
+                                      ),
+                                      _buildFieldRow(
+                                        loginConfig?.field12,
+                                        viewModel.currentUser!.field12,
+                                      ),
+                                      _buildFieldRow(
+                                        loginConfig?.field13,
+                                        viewModel.currentUser!.field13,
+                                      ),
+                                      _buildFieldRow(
+                                        loginConfig?.field14,
+                                        viewModel.currentUser!.field14,
+                                      ),
+                                      _buildFieldRow(
+                                        loginConfig?.field15,
+                                        viewModel.currentUser!.field15,
+                                      ),
+                                    ] else ...[
+                                      Text(
+                                        "",
+                                        style: TextStyle(
+                                          fontSize: AppFontSize.sizeSmall,
+                                          color: Colors.red,
+                                        ),
+                                      ),
                                     ],
+                                  ],
+                                ),
+                          const SizedBox(height: 30),
+                          if (widget.autoClose)
+                            Text(
+                              'Tự động đóng sau 3 giây....',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: isTablet
+                                    ? (AppFontSize.sizeSmall ?? 16)
+                                    : (AppFontSize.sizeSuperSmall ?? 14),
+                                fontStyle: FontStyle.italic,
+                                color: Colors.grey[600],
+                              ),
+                            )
+                          else if (_isLoading)
+                            LoadingAnimationWidget.threeRotatingDots(
+                              color: AppColor.successQRCode,
+                              size: 50,
+                            )
+                          else
+                            Column(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: _onContinuePressed,
+                                  style: ButtonStyle(
+                                    padding: WidgetStateProperty.all(
+                                      const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                        horizontal: 36,
+                                      ),
+                                    ),
+                                    backgroundColor:
+                                        WidgetStateProperty.resolveWith(
+                                      (states) {
+                                        if (states
+                                            .contains(WidgetState.pressed)) {
+                                          return Colors.greenAccent.shade400;
+                                        }
+                                        return AppColor.successQRCode;
+                                      },
+                                    ),
+                                    shape: WidgetStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                    ),
+                                    elevation: WidgetStateProperty.all(10),
                                   ),
-                                  const SizedBox(height: 20),
-                                  _buildFieldRow(
-                                    viewModel.indexViewModel.loginViewModel
-                                        .userLogin!.field2,
-                                    viewModel.currentUser!.field2,
-                                  ),
-                                  _buildFieldRow(
-                                    viewModel.indexViewModel.loginViewModel
-                                        .userLogin!.field3,
-                                    viewModel.currentUser!.field3,
-                                  ),
-                                  _buildFieldRow(
-                                    viewModel.indexViewModel.loginViewModel
-                                        .userLogin!.field4,
-                                    viewModel.currentUser!.field4,
-                                  ),
-                                  _buildFieldRow(
-                                    viewModel.indexViewModel.loginViewModel
-                                        .userLogin!.field5,
-                                    viewModel.currentUser!.field5,
-                                  ),
-                                  _buildFieldRow(
-                                    viewModel.indexViewModel.loginViewModel
-                                        .userLogin!.field6,
-                                    viewModel.currentUser!.field6,
-                                  ),
-                                  _buildFieldRow(
-                                    viewModel.indexViewModel.loginViewModel
-                                        .userLogin!.field7,
-                                    viewModel.currentUser!.field7,
-                                  ),
-                                  _buildFieldRow(
-                                    viewModel.indexViewModel.loginViewModel
-                                        .userLogin!.field8,
-                                    viewModel.currentUser!.field8,
-                                  ),
-                                  _buildFieldRow(
-                                    viewModel.indexViewModel.loginViewModel
-                                        .userLogin!.field9,
-                                    viewModel.currentUser!.field9,
-                                  ),
-                                  _buildFieldRow(
-                                    viewModel.indexViewModel.loginViewModel
-                                        .userLogin!.field10,
-                                    viewModel.currentUser!.field10,
-                                  ),
-                                  _buildFieldRow(
-                                    viewModel.indexViewModel.loginViewModel
-                                        .userLogin!.field11,
-                                    viewModel.currentUser!.field11,
-                                  ),
-                                  _buildFieldRow(
-                                    viewModel.indexViewModel.loginViewModel
-                                        .userLogin!.field12,
-                                    viewModel.currentUser!.field12,
-                                  ),
-                                  _buildFieldRow(
-                                    viewModel.indexViewModel.loginViewModel
-                                        .userLogin!.field13,
-                                    viewModel.currentUser!.field13,
-                                  ),
-                                  _buildFieldRow(
-                                    viewModel.indexViewModel.loginViewModel
-                                        .userLogin!.field14,
-                                    viewModel.currentUser!.field14,
-                                  ),
-                                  _buildFieldRow(
-                                    viewModel.indexViewModel.loginViewModel
-                                        .userLogin!.field15,
-                                    viewModel.currentUser!.field15,
-                                  ),
-                                ] else ...[
-                                  Text(
-                                    "",
+                                  child: Text(
+                                    "TIẾP TỤC CHECK IN",
                                     style: TextStyle(
-                                      fontSize: AppFontSize.sizeSmall,
-                                      color: Colors.red,
+                                      fontSize: buttonFontSize,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
                                     ),
                                   ),
-                                ],
+                                ),
+                                const SizedBox(height: 20),
+                                ElevatedButton(
+                                  onPressed: _onContinuePressedHistory,
+                                  style: ButtonStyle(
+                                    padding: WidgetStateProperty.all(
+                                      const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                        horizontal: 18,
+                                      ),
+                                    ),
+                                    backgroundColor:
+                                        WidgetStateProperty.resolveWith(
+                                      (states) {
+                                        if (states
+                                            .contains(WidgetState.pressed)) {
+                                          return Colors.red.shade400;
+                                        }
+                                        return AppColor.primaryColor;
+                                      },
+                                    ),
+                                    shape: WidgetStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                    ),
+                                    elevation: WidgetStateProperty.all(10),
+                                  ),
+                                  child: Text(
+                                    "QUAY LẠI DANH SÁCH",
+                                    style: TextStyle(
+                                      fontSize: buttonFontSize,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
-                      const SizedBox(height: 30),
-                      if (widget.autoClose)
-                        Text(
-                          'Tự động đóng sau 3 giây....',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: isTablet
-                                ? (AppFontSize.sizeSmall ?? 16)
-                                : (AppFontSize.sizeSuperSmall ?? 14),
-                            fontStyle: FontStyle.italic,
-                            color: Colors.grey[600],
-                          ),
-                        )
-                      else if (_isLoading)
-                        LoadingAnimationWidget.threeRotatingDots(
-                          color: AppColor.successQRCode,
-                          size: 50,
-                        )
-                      else
-                        Column(
-                          children: [
-                            ElevatedButton(
-                              onPressed: _onContinuePressed,
-                              style: ButtonStyle(
-                                padding: WidgetStateProperty.all(
-                                  const EdgeInsets.symmetric(
-                                    vertical: 10,
-                                    horizontal: 36,
-                                  ),
-                                ),
-                                backgroundColor:
-                                    WidgetStateProperty.resolveWith(
-                                  (states) {
-                                    if (states.contains(WidgetState.pressed)) {
-                                      return Colors.greenAccent.shade400;
-                                    }
-                                    return AppColor.successQRCode;
-                                  },
-                                ),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                ),
-                                elevation: WidgetStateProperty.all(10),
-                              ),
-                              child: Text(
-                                "TIẾP TỤC CHECK IN",
-                                style: TextStyle(
-                                  fontSize: buttonFontSize,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: _onContinuePressedHistory,
-                              style: ButtonStyle(
-                                padding: WidgetStateProperty.all(
-                                  const EdgeInsets.symmetric(
-                                    vertical: 10,
-                                    horizontal: 18,
-                                  ),
-                                ),
-                                backgroundColor:
-                                    WidgetStateProperty.resolveWith(
-                                  (states) {
-                                    if (states.contains(WidgetState.pressed)) {
-                                      return Colors.red.shade400;
-                                    }
-                                    return AppColor.primaryColor;
-                                  },
-                                ),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                ),
-                                elevation: WidgetStateProperty.all(10),
-                              ),
-                              child: Text(
-                                "QUAY LẠI DANH SÁCH",
-                                style: TextStyle(
-                                  fontSize: buttonFontSize,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                    ],
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
