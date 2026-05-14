@@ -82,7 +82,6 @@ class UserRequest {
       } else if (response.statusCode == 200) {
         if (response.data['LLichSuCheckin'] is List) {
           List<dynamic> data = response.data['LLichSuCheckin'];
-          print('dataa o đây $data');
           lstUsers = data.map((json) => Users.fromJson(json)).toList();
         } else {}
       } else {
@@ -141,7 +140,6 @@ class UserRequest {
         print('Lỗi gọi API');
       } else if (response.statusCode == 200) {
         List<dynamic> data = response.data;
-        print('DATA STATUS -> ${data}');
         lstStatus = data.map((json) => CheckinModel.fromJson(json)).toList();
       } else {
         throw Exception('Failed to load status');

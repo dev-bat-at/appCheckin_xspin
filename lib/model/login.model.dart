@@ -25,6 +25,7 @@ class Login {
   String? imageQr;
   String? cameraCheckin;
   String? maKhachHang;
+  String? isCheckinTuDong;
   Login(
       {this.diaDiem,
       required this.idSuKien, // Bắt buộc phải có giá trị
@@ -51,7 +52,8 @@ class Login {
       this.isNhieuLine,
       this.imageQr,
       this.cameraCheckin,
-      this.maKhachHang});
+      this.maKhachHang,
+      this.isCheckinTuDong});
 
   factory Login.fromJson(Map<String, dynamic> json) {
     return Login(
@@ -80,6 +82,7 @@ class Login {
         isNhieuLine: json['isNhieuLine'],
         imageQr: json['AnhNenQR'],
         cameraCheckin: json['CameraCheckinTuDong'],
+        isCheckinTuDong: json['isCheckinTuDong']?.toString(),
         maKhachHang: json['MaKhachHang']);
   }
 
@@ -111,7 +114,8 @@ class Login {
       'isNhieuLine': isNhieuLine,
       'AnhNenQR': imageQr,
       'CameraCheckinTuDong': cameraCheckin,
-      'MaKhachHang': maKhachHang
+      'MaKhachHang': maKhachHang,
+      'isCheckinTuDong': isCheckinTuDong
     };
   }
 }

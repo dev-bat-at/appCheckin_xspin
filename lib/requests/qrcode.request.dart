@@ -50,6 +50,31 @@ class QRCodeRequest {
       {required String idSuKien,
       required String maQR,
       String? idLineCheckin}) async {
+    return _checkIn(
+      apiPath: Api.checkIn,
+      idSuKien: idSuKien,
+      maQR: maQR,
+      idLineCheckin: idLineCheckin,
+    );
+  }
+
+  Future<QRCodeCheckInResult> autoCheckIn(
+      {required String idSuKien,
+      required String maQR,
+      String? idLineCheckin}) async {
+    return _checkIn(
+      apiPath: Api.autoCheckIn,
+      idSuKien: idSuKien,
+      maQR: maQR,
+      idLineCheckin: idLineCheckin,
+    );
+  }
+
+  Future<QRCodeCheckInResult> _checkIn(
+      {required String apiPath,
+      required String idSuKien,
+      required String maQR,
+      String? idLineCheckin}) async {
     final Map<String, dynamic> body = {
       'idSuKien': idSuKien,
       'MaThamDu': maQR,
@@ -57,7 +82,7 @@ class QRCodeRequest {
     };
     try {
       final response = await ApiService()
-          .QrCode('${Api.hostApi}${Api.checkIn}', queryParameters: body)
+          .QrCode('${Api.hostApi}$apiPath', queryParameters: body)
           .timeout(Duration(seconds: 10), onTimeout: () {
         throw TimeoutException(
             'Yêu cầu mất quá nhiều thời gian, kiểm tra kết nối mạng.');

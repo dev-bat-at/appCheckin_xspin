@@ -356,11 +356,17 @@ class QRCodeViewModel extends BaseViewModel {
         final maxCheckinCount = userDetail.soLuotCheckIntoida ?? 1;
 
         if (checkedInCount < maxCheckinCount) {
-          final checkInResult = await qrCodeRequest.checkIn(
-            idSuKien: AppSP.get(AppSPKey.idSuKien),
-            maQR: qrCode,
-            idLineCheckin: AppSP.get(AppSPKey.idLineCheckin),
-          );
+          final checkInResult = flowMode == QRCodeFlowMode.automatic
+              ? await qrCodeRequest.autoCheckIn(
+                  idSuKien: AppSP.get(AppSPKey.idSuKien),
+                  maQR: qrCode,
+                  idLineCheckin: AppSP.get(AppSPKey.idLineCheckin),
+                )
+              : await qrCodeRequest.checkIn(
+                  idSuKien: AppSP.get(AppSPKey.idSuKien),
+                  maQR: qrCode,
+                  idLineCheckin: AppSP.get(AppSPKey.idLineCheckin),
+                );
 
           if (checkInResult.status == 1) {
             currentUser = _mergeUserData(

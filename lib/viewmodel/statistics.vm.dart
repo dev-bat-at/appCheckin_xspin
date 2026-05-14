@@ -69,6 +69,7 @@ class StatisticsViewModel extends BaseViewModel {
 
     final nextLoaiCheckin = latestConfig.loaiCheckin ?? '';
     final nextIsNhieuLine = latestConfig.isNhieuLine ?? '';
+    final nextIsCheckinTuDong = latestConfig.isCheckinTuDong ?? '';
     final nextIdSuKien = latestConfig.idSuKien;
 
     final hasCheckinModeChanged = currentLoaiCheckin != nextLoaiCheckin ||
@@ -78,6 +79,7 @@ class StatisticsViewModel extends BaseViewModel {
     await AppSP.set(AppSPKey.idSuKien, nextIdSuKien);
     await AppSP.set(AppSPKey.loaiCheckin, nextLoaiCheckin);
     await AppSP.set(AppSPKey.isNhieuLine, nextIsNhieuLine);
+    await AppSP.set(AppSPKey.isCheckinTuDong, nextIsCheckinTuDong);
 
     if (hasCheckinModeChanged) {
       await AppSP.set(AppSPKey.idLineCheckin, '');

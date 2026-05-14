@@ -90,8 +90,6 @@ class UsersViewModel extends BaseViewModel {
         searchQuery: search.text,
       );
       selectedStatus = 'all';
-      print(
-          "Số lượng danh sách theo tình trạng ${detailUser!.maTinhTrang} là: ${lstUsers.length}");
     } catch (e) {
       print('Error in getUsersByStatus: $e');
     } finally {
@@ -111,9 +109,6 @@ class UsersViewModel extends BaseViewModel {
         page: currentPageAll,
         searchQuery: search.text,
       );
-      print(
-          "Số lượng danh sách theo tình trạng ${selectedStatus} là: ${lstUsers.length}");
-      print('Đây là trang ${currentPageAll} có ${lstUsers.length} data');
     } catch (e) {
       print('Error in getUsersByStatus: $e');
     } finally {
@@ -178,8 +173,6 @@ class UsersViewModel extends BaseViewModel {
 
       lstUsers = allUsers;
       checkInUser = results.last;
-
-      print("Tổng số người dùng: ${lstUsers.length}");
     } catch (e) {
       print('Error in getUsers: $e');
     } finally {
@@ -240,7 +233,6 @@ class UsersViewModel extends BaseViewModel {
           if (status.idStatus == null || status.idStatus!.isEmpty) {
             continue;
           }
-          print("Loading thêm người dùng với tình trạng: ${status.idStatus}");
 
           var moreUsers = await userRequest.getListUser(
             idSuKien: AppSP.get(AppSPKey.idSuKien),
@@ -297,7 +289,6 @@ class UsersViewModel extends BaseViewModel {
         idSuKien: AppSP.get(AppSPKey.idSuKien),
         MatinhTrang: status ?? "",
         key: "");
-    print('Người tham dự: ${countUser}');
     setBusy(false);
     notifyListeners();
   }
@@ -306,7 +297,6 @@ class UsersViewModel extends BaseViewModel {
     setBusy(true);
     sumUser = await userRequest.getCountLstUser(
         idSuKien: AppSP.get(AppSPKey.idSuKien), MatinhTrang: "", key: "");
-    print('Người tham dự: ${sumUser}');
     setBusy(false);
     notifyListeners();
   }

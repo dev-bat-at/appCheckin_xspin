@@ -11,6 +11,11 @@ class ApiLogInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) {
+    if (_shouldSkipLog(options.uri)) {
+      handler.next(options);
+      return;
+    }
+
     _printSection(
       'REQUEST',
       [
@@ -25,6 +30,11 @@ class ApiLogInterceptor extends Interceptor {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
+    if (_shouldSkipLog(response.requestOptions.uri)) {
+      handler.next(response);
+      return;
+    }
+
     _printSection(
       'RESPONSE',
       [
@@ -39,6 +49,11 @@ class ApiLogInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
+    if (_shouldSkipLog(err.requestOptions.uri)) {
+      handler.next(err);
+      return;
+    }
+
     _printSection(
       'ERROR',
       [
@@ -103,5 +118,15 @@ class ApiLogInterceptor extends Interceptor {
         normalizedKey.contains('token') ||
         normalizedKey.contains('authorization') ||
         normalizedKey.contains('x-api-key');
+  }
+
+  bool _shouldSkipLog(Uri uri) {
+    final url = uri.toString();
+    return url.contains('/getListNguoiThamDu') ||
+        url.contains('/getListNguoiThamDu_1L') ||
+        url.contains('/getListLichSuCheckin') ||
+        url.contains('/getDemSoNguoiThamDu') ||
+        url.contains('/getDemSoNguoiThamDu_1L') ||
+        url.contains('/getDemSoLuotCheckin');
   }
 }
