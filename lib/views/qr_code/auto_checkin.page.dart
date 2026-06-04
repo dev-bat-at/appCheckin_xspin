@@ -129,9 +129,11 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
 
   CameraFacing _resolveCameraFacing(String? cameraSetting) {
     switch (cameraSetting?.trim()) {
-      case 'CameraSau':
-        return CameraFacing.back;
-      case 'CameraTruoc':
+      // case 'CameraSau':
+      //   return CameraFacing.back;
+      // case 'CameraTruoc':
+      // default:
+      //   return CameraFacing.front;
       default:
         return CameraFacing.front;
     }
@@ -247,13 +249,7 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
                   return Stack(
                     fit: StackFit.expand,
                     children: [
-                      viewModel.isFrontCamera
-                          ? Transform(
-                              alignment: Alignment.center,
-                              transform: Matrix4.identity()..rotateY(math.pi),
-                              child: scanner,
-                            )
-                          : scanner,
+                      scanner,
                       _AutoCheckinBackgroundLayer(
                         imageQr: loginViewModel.userLogin?.imageQr,
                         cutoutRect: scanWindow,

@@ -71,8 +71,14 @@ class QRCodeViewModel extends BaseViewModel {
       scannerController = MobileScannerController(
         autoStart: false,
         facing: _scannerFacing,
-        detectionSpeed: DetectionSpeed.noDuplicates,
-        detectionTimeoutMs: 500,
+        formats: const [BarcodeFormat.qrCode],
+        // DetectionSpeed.noDuplicates bị bỏ vì nó cache QR value ở native layer
+        // và không fire onDetect cho cùng mã QR ngay cả sau stop/start.
+        // Dùng normal + timeout để scanner luôn sẵn sàng sau mỗi chu kỳ.
+        detectionSpeed: DetectionSpeed.normal,
+        detectionTimeoutMs: 800,
+        cameraResolution: const Size(640, 480),
+        returnImage: false,
       );
     }
   }
@@ -439,8 +445,14 @@ class QRCodeViewModel extends BaseViewModel {
       return;
     }
 
+    // Reset scan lock BEFORE restarting — isScanQr=true còn kẹt vì
+    // finally block trong _handleDetection chạy sau khi showAutomaticResult
+    // hoàn tất (tức là sau đây). Nếu không reset sớm, scanner chạy nhưng
+    // mọi detection đều bị block ngay.
+    isScanQr = false;
+
     bindScannerPage(viewContext);
-    await Future<void>.delayed(const Duration(milliseconds: 120));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
     await startScannerSafely();
   }
 
