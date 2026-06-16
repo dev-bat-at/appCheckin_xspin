@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:checkin/app/app_route_observer.dart';
 import 'package:checkin/base/base_page.dart';
+import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/constants/app_fontsize.dart';
 import 'package:checkin/viewmodel/index.vm.dart';
 import 'package:checkin/viewmodel/qr_code.vm.dart';
@@ -27,6 +28,7 @@ class QrCodePage extends StatefulWidget {
 class _QrCodePageState extends State<QrCodePage>
     with WidgetsBindingObserver, RouteAware {
   ModalRoute<dynamic>? _route;
+  final TextEditingController _demoQRCodeController = TextEditingController();
 
   @override
   void initState() {
@@ -56,6 +58,7 @@ class _QrCodePageState extends State<QrCodePage>
     }
     widget.qrViewModel.unbindScannerPage();
     unawaited(widget.qrViewModel.disposeScanner());
+    _demoQRCodeController.dispose();
     super.dispose();
   }
 
@@ -98,6 +101,33 @@ class _QrCodePageState extends State<QrCodePage>
     await widget.qrViewModel.startScannerSafely();
   }
 
+  void _scheduleScannerWarmup() {
+    for (final delay in const [
+      Duration(milliseconds: 250),
+      Duration(milliseconds: 700),
+    ]) {
+      Future<void>.delayed(delay, () {
+        if (!mounted) {
+          return;
+        }
+        unawaited(_resumeScannerIfVisible());
+      });
+    }
+  }
+
+  Future<void> _submitDemoQRCode(QRCodeViewModel viewModel) async {
+    final qrCode = _demoQRCodeController.text.trim();
+    if (qrCode.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng nhập mã QR demo')),
+      );
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
+    await viewModel.runDemoCheckIn(qrCode);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder.reactive(
@@ -108,9 +138,15 @@ class _QrCodePageState extends State<QrCodePage>
         viewModel.bindScannerPage(context);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           unawaited(_resumeScannerIfVisible());
+          _scheduleScannerWarmup();
         });
       },
       builder: (context, viewModel, child) {
+        final mediaQuery = MediaQuery.of(context);
+        final isTablet = mediaQuery.size.shortestSide >= 600;
+        final bottomInset = mediaQuery.viewInsets.bottom;
+        final scanAreaSize = isTablet ? 320.0 : 250.0;
+
         viewModel.bindScannerPage(context);
         return BasePage(
           showLogo: true,
@@ -124,13 +160,19 @@ class _QrCodePageState extends State<QrCodePage>
                       flex: 2,
                       child: LayoutBuilder(
                         builder: (context, constraints) {
+                          final scanArea = scanAreaSize
+                              .clamp(
+                                220.0,
+                                constraints.biggest.shortestSide,
+                              )
+                              .toDouble();
                           final scanWindow = Rect.fromCenter(
                             center: Offset(
                               constraints.maxWidth / 2,
                               constraints.maxHeight / 2,
                             ),
-                            width: 250,
-                            height: 250,
+                            width: scanArea,
+                            height: scanArea,
                           );
 
                           return Stack(
@@ -158,8 +200,9 @@ class _QrCodePageState extends State<QrCodePage>
                                           .toList();
                                       for (final barcode in barcodes) {
                                         final String? rawValue =
-                                            barcode.rawValue;
-                                        if (rawValue != null) {
+                                            barcode.rawValue?.trim();
+                                        if (rawValue != null &&
+                                            rawValue.isNotEmpty) {
                                           viewModel.currentQRCode = rawValue;
                                           print('QR Code found: $rawValue');
                                           await viewModel.getUsers();
@@ -173,8 +216,9 @@ class _QrCodePageState extends State<QrCodePage>
                                 },
                               ),
                               QRScannerOverlay(
-                                overlayColor: Colors.black.withOpacity(0.5),
-                                scanAreaSize: const Size(250, 250),
+                                overlayColor:
+                                    Colors.black.withValues(alpha: 0.5),
+                                scanAreaSize: Size(scanArea, scanArea),
                               ),
                             ],
                           );
@@ -192,7 +236,7 @@ class _QrCodePageState extends State<QrCodePage>
                       padding:
                           EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                       decoration: BoxDecoration(
-                        color: Colors.redAccent.withOpacity(0.5),
+                        color: Colors.redAccent.withValues(alpha: 0.5),
                       ),
                       child: Text(
                         'Hãy đưa mã QR vào giữa khung',
@@ -213,7 +257,7 @@ class _QrCodePageState extends State<QrCodePage>
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 3, horizontal: 5),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.5),
+                        color: Colors.white.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
                       child: IconButton(
@@ -230,6 +274,12 @@ class _QrCodePageState extends State<QrCodePage>
                     ),
                   ),
                 ),
+                // Positioned(
+                //   left: 16,
+                //   right: 16,
+                //   bottom: bottomInset + 18,
+                //   child: _buildDemoQRCodeInput(context, viewModel, isTablet),
+                // ),
               ],
             ),
           ),
@@ -238,4 +288,86 @@ class _QrCodePageState extends State<QrCodePage>
       },
     );
   }
+
+//   Widget _buildDemoQRCodeInput(
+//     BuildContext context,
+//     QRCodeViewModel viewModel,
+//     bool isTablet,
+//   ) {
+//     final buttonLabel = viewModel.isBusy ? 'Đang gửi' : 'Demo';
+
+//     return Center(
+//       child: ConstrainedBox(
+//         constraints: BoxConstraints(maxWidth: isTablet ? 560 : double.infinity),
+//         child: Material(
+//           color: Colors.black.withValues(alpha: 0.58),
+//           borderRadius: BorderRadius.circular(14),
+//           child: Padding(
+//             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+//             child: Row(
+//               children: [
+//                 // Expanded(
+//                 //   child: TextField(
+//                 //     controller: _demoQRCodeController,
+//                 //     enabled: !viewModel.isBusy,
+//                 //     keyboardType: TextInputType.number,
+//                 //     textInputAction: TextInputAction.done,
+//                 //     onSubmitted: (_) => _submitDemoQRCode(viewModel),
+//                 //     style: const TextStyle(color: Colors.white),
+//                 //     decoration: InputDecoration(
+//                 //       isDense: true,
+//                 //       hintText: 'Nhập mã QR demo',
+//                 //       hintStyle: TextStyle(
+//                 //         color: Colors.white.withValues(alpha: 0.76),
+//                 //       ),
+//                 //       prefixIcon: const Icon(
+//                 //         Icons.qr_code_2_rounded,
+//                 //         color: Colors.white,
+//                 //       ),
+//                 //       filled: true,
+//                 //       fillColor: Colors.white.withValues(alpha: 0.12),
+//                 //       border: OutlineInputBorder(
+//                 //         borderRadius: BorderRadius.circular(12),
+//                 //         borderSide: BorderSide.none,
+//                 //       ),
+//                 //       contentPadding: const EdgeInsets.symmetric(
+//                 //         horizontal: 12,
+//                 //         vertical: 12,
+//                 //       ),
+//                 //     ),
+//                 //   ),
+//                 // ),
+//                 const SizedBox(width: 10),
+//                 ElevatedButton(
+//                   onPressed: viewModel.isBusy
+//                       ? null
+//                       : () => _submitDemoQRCode(viewModel),
+//                   style: ElevatedButton.styleFrom(
+//                     backgroundColor: AppColor.successQRCode,
+//                     foregroundColor: Colors.white,
+//                     disabledBackgroundColor: Colors.grey.shade500,
+//                     padding: const EdgeInsets.symmetric(
+//                       horizontal: 18,
+//                       vertical: 13,
+//                     ),
+//                     shape: RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.circular(12),
+//                     ),
+//                   ),
+//                   child: Text(
+//                     buttonLabel,
+//                     style: TextStyle(
+//                       fontSize: AppFontSize.sizeSmall,
+//                       fontWeight: FontWeight.w800,
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 }

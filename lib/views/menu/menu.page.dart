@@ -39,6 +39,91 @@ class _MenuPageState extends State<MenuPage> {
     }
   }
 
+  void _showAutoCheckinUpgradeDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (context) => Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(22, 24, 22, 18),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.16),
+                blurRadius: 28,
+                offset: const Offset(0, 14),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 76,
+                height: 76,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF4E5),
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: const Icon(
+                  Icons.workspace_premium_rounded,
+                  color: Color(0xFFE58A2C),
+                  size: 42,
+                ),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                'Nâng cấp gói chuyên nghiệp',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFF7A1621),
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Nâng cấp lên gói chuyên nghiệp để sử dụng tính năng check-in tự động!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontSize: 15,
+                  height: 1.45,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 22),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: FilledButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColor.primaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: const Text(
+                    'Đã hiểu',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<LoginViewModel>.reactive(
@@ -99,7 +184,7 @@ class _MenuPageState extends State<MenuPage> {
                             child: const Icon(
                               Icons.dashboard_customize_outlined,
                               color: Colors.white,
-                              size: 26,
+                              size: 18,
                             ),
                           ),
                           const SizedBox(width: 14),
@@ -113,14 +198,6 @@ class _MenuPageState extends State<MenuPage> {
                                     color: Colors.white,
                                     fontWeight: FontWeight.w800,
                                     fontSize: 18,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Quản lý nhanh thông tin sự kiện, line check-in và các tác vụ chính.',
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.86),
-                                    height: 1.35,
                                   ),
                                 ),
                               ],
@@ -204,7 +281,6 @@ class _MenuPageState extends State<MenuPage> {
                 _MenuCard(
                   icon: Icons.info_outline,
                   title: 'Thông tin sự kiện',
-                  subtitle: 'Xem thông tin sự kiện và số lượt check-in',
                   accentColor: AppColor.primaryColor,
                   backgroundColor: Colors.white,
                   onTap: () {
@@ -221,8 +297,7 @@ class _MenuPageState extends State<MenuPage> {
                 ),
                 _MenuCard(
                   icon: Icons.query_stats,
-                  title: 'Báo cáo số lượt check-in',
-                  subtitle: 'Xem tổng quan và chi tiết theo nhóm',
+                  title: 'Thống kê',
                   accentColor: const Color(0xFFE58A2C),
                   backgroundColor: const Color(0xFFFFF8EF),
                   onTap: () {
@@ -236,11 +311,18 @@ class _MenuPageState extends State<MenuPage> {
                 ),
                 _MenuCard(
                   icon: Icons.qr_code_scanner_outlined,
-                  title: 'Checkin tự động',
-                  subtitle: 'Quet bang camera truoc va tu dong quay lai',
+                  title: 'Check-in tự động',
                   accentColor: const Color(0xFF127A67),
                   backgroundColor: const Color(0xFFF1FBF8),
-                  onTap: () {
+                  onTap: () async {
+                    await widget.loginViewModel.loadUser();
+                    if (!mounted) {
+                      return;
+                    }
+                    if (AppSP.get(AppSPKey.isCheckinTuDong) != '1') {
+                      _showAutoCheckinUpgradeDialog();
+                      return;
+                    }
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -278,7 +360,6 @@ class _MenuPageState extends State<MenuPage> {
                 _MenuCard(
                   icon: Icons.logout,
                   title: 'Đăng xuất',
-                  subtitle: 'Thoát khỏi tài khoản hiện tại',
                   accentColor: Colors.redAccent,
                   backgroundColor: const Color(0xFFFFF3F2),
                   onTap: () => widget.loginViewModel.showLogOut(context),
@@ -296,7 +377,6 @@ class _MenuCard extends StatelessWidget {
   const _MenuCard({
     required this.icon,
     required this.title,
-    required this.subtitle,
     required this.onTap,
     required this.accentColor,
     required this.backgroundColor,
@@ -304,7 +384,6 @@ class _MenuCard extends StatelessWidget {
 
   final IconData icon;
   final String title;
-  final String subtitle;
   final VoidCallback onTap;
   final Color accentColor;
   final Color backgroundColor;
@@ -343,15 +422,8 @@ class _MenuCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        height: 1.35,
-                      ),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w800, fontSize: 16),
                     ),
                   ],
                 ),

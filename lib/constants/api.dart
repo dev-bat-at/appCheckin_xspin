@@ -11,6 +11,8 @@ class Api {
 
   static const checkIn = '/checkin';
 
+  static const autoCheckIn = '/checkinTuDong';
+
   static const getQRCode = '/GetMaQR';
 
   static const getCountUser = '/getDemSoLuotCheckin';

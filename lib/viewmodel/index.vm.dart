@@ -30,15 +30,11 @@ class IndexViewModel extends BaseViewModel {
   Future<void> _reloadCurrentPage() async {
     if (currentIndex == 0) {
       if (AppSP.get(AppSPKey.loaiCheckin) == 'NL') {
-        await usersViewModel.getUsersByStatus(usersViewModel.selectedStatus);
-        if (usersViewModel.selectedStatus == 'all') {
-          usersViewModel.getUsers();
-          usersViewModel.getCountUserJoin('');
-        }
+        await usersViewModel.reloadUsers();
         _isQRCodePageInitialized = false;
         print("Đây là trạng thái : ${usersViewModel.selectedStatus}");
       } else if (AppSP.get(AppSPKey.loaiCheckin) == '1L') {
-        historyViewModel.reloadUsers();
+        await historyViewModel.reloadUsers();
         _isQRCodePageInitialized = false;
       }
     }

@@ -15,19 +15,56 @@ class StatisticSummary {
     this.chuaTungCheckin = 0,
   });
 
+  const StatisticSummary.empty()
+      : tongNguoiThamDu = 0,
+        daCheckin = 0,
+        chuaCheckin = 0,
+        daCheckinXong = 0,
+        dangCheckin = 0,
+        chuaTungCheckin = 0;
+
+  StatisticSummary operator +(StatisticSummary other) {
+    return StatisticSummary(
+      tongNguoiThamDu: tongNguoiThamDu + other.tongNguoiThamDu,
+      daCheckin: daCheckin + other.daCheckin,
+      chuaCheckin: chuaCheckin + other.chuaCheckin,
+      daCheckinXong: daCheckinXong + other.daCheckinXong,
+      dangCheckin: dangCheckin + other.dangCheckin,
+      chuaTungCheckin: chuaTungCheckin + other.chuaTungCheckin,
+    );
+  }
+
+  factory StatisticSummary.sum(Iterable<StatisticSummary> items) {
+    return items.fold(
+      const StatisticSummary.empty(),
+      (total, item) => total + item,
+    );
+  }
+
   factory StatisticSummary.fromJson(
     Map<String, dynamic> json, {
     required bool isSingleCheckin,
   }) {
     int parseInt(dynamic value) => int.tryParse(value?.toString() ?? '0') ?? 0;
+    int firstAvailable(List<String> keys) {
+      for (final key in keys) {
+        if (json.containsKey(key) && json[key] != null) {
+          return parseInt(json[key]);
+        }
+      }
+      return 0;
+    }
 
     return StatisticSummary(
       tongNguoiThamDu: parseInt(json['TongNguoiThamDu']),
-      daCheckin: isSingleCheckin ? 0 : parseInt(json['DaCheckin']),
-      chuaCheckin: isSingleCheckin ? 0 : parseInt(json['ChuaCheckin']),
-      daCheckinXong: isSingleCheckin ? parseInt(json['DaCheckinXong']) : 0,
-      dangCheckin: isSingleCheckin ? parseInt(json['DangCheckin']) : 0,
-      chuaTungCheckin: isSingleCheckin ? parseInt(json['ChuaTungCheckin']) : 0,
+      daCheckin: isSingleCheckin ? firstAvailable(['DaCheckin']) : 0,
+      chuaCheckin: isSingleCheckin ? firstAvailable(['ChuaCheckin']) : 0,
+      daCheckinXong:
+          isSingleCheckin ? 0 : firstAvailable(['DaCheckinXong', 'DaCheckin']),
+      dangCheckin: isSingleCheckin ? 0 : firstAvailable(['DangCheckin']),
+      chuaTungCheckin: isSingleCheckin
+          ? 0
+          : firstAvailable(['ChuaTungCheckin', 'ChuaCheckin']),
     );
   }
 }

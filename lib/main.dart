@@ -1,5 +1,6 @@
 import 'package:checkin/app/di.dart';
 import 'package:checkin/app/app_route_observer.dart';
+import 'package:checkin/constants/app_fontsize.dart';
 import 'package:checkin/views/splash/splash.page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,6 +30,17 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
+        builder: (context, child) {
+          final mediaQuery = MediaQuery.of(context);
+          return MediaQuery(
+            data: mediaQuery.copyWith(
+              textScaler: TextScaler.linear(
+                AppFontSize.effectiveTextScale(context),
+              ),
+            ),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
         navigatorObservers: [appRouteObserver],
         home: const SplashPage());
   }

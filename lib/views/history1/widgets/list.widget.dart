@@ -24,22 +24,20 @@ class _ListUserCheckinState extends State<ListUserCheckin> {
         viewModel.viewContext = context;
       },
       builder: (context, viewModel, child) {
-        return SingleChildScrollView(
-          child: Column(
-            children: [
-              ...List.generate(widget.users.length, (index) {
-                return ItemTicket(
-                  onTap: () {
-                    viewModel.detailUser = widget.users[index];
-                    viewModel.viewContext = context;
-                    viewModel.nextDetailTicket();
-                  },
-                  usersViewModel: viewModel,
-                  user: widget.users[index],
-                );
-              }),
-            ],
-          ),
+        return Column(
+          children: [
+            ...List.generate(widget.users.length, (index) {
+              return ItemTicket(
+                onTap: () {
+                  viewModel.detailUser = widget.users[index];
+                  viewModel.viewContext = context;
+                  viewModel.nextDetailTicket();
+                },
+                usersViewModel: viewModel,
+                user: widget.users[index],
+              );
+            }),
+          ],
         );
       },
     );

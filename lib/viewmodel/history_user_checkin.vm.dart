@@ -60,20 +60,12 @@ class HistoryCheckinViewModel extends BaseViewModel {
 
   Future<void> reloadUsers() async {
     print('Tình trạng 1L');
-    setBusy(true);
-    try {
-      currentPageAll = 1;
-      lstUsers = await userRequest.getListUser_1L(
-          idSuKien: AppSP.get(AppSPKey.idSuKien),
-          tinhTrang: "",
-          page: currentPageAll,
-          searchQuery: search.text);
-    } catch (e) {
-      print('Lỗi reloadUsers: $e');
-    } finally {
-      setBusy(false);
-      notifyListeners();
-    }
+    resetPagination();
+    await Future.wait([
+      getUsers(),
+      getCountUser(),
+      getCountUserCheckIn(),
+    ]);
   }
 
   Future<void> getUsers() async {

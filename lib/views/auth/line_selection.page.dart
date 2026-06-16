@@ -99,6 +99,7 @@ class _LineSelectionPageState extends State<LineSelectionPage> {
     await AppSP.set(AppSPKey.idSuKien, '');
     await AppSP.set(AppSPKey.loaiCheckin, '');
     await AppSP.set(AppSPKey.isNhieuLine, '');
+    await AppSP.set(AppSPKey.isCheckinTuDong, '');
     await AppSP.set(AppSPKey.idLineCheckin, '');
     await AppSP.set(AppSPKey.tenLineCheckin, '');
 
@@ -209,7 +210,7 @@ class _LineSelectionPageState extends State<LineSelectionPage> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Chọn line phù hợp để hệ thống gửi đúng quầy khi check-in QR.',
+                              'Bạn vui lòng chọn line check-in phù hợp',
                               style: TextStyle(
                                 fontSize: AppFontSize.sizeSmall,
                                 color: Colors.white.withValues(alpha: 0.88),

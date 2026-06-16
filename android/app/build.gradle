@@ -32,7 +32,7 @@ if (flutterVersionName == null) {
 android {
     namespace "com.xspin.checkin"
     compileSdk flutter.compileSdkVersion
-    ndkVersion "29.0.13846066"
+    // ndkVersion "29.0.13846066"
 
 
     compileOptions {
@@ -73,7 +73,7 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             // signingConfig = signingConfigs.debug
-            signingConfig = signingConfigs.debug
+            signingConfig = signingConfigs.release
         }
     }
 }

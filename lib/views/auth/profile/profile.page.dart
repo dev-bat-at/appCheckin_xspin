@@ -6,7 +6,6 @@ import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/constants/app_fontsize.dart';
 import 'package:checkin/viewmodel/index.vm.dart';
 import 'package:checkin/viewmodel/login.vm.dart';
-import 'package:checkin/views/auth/widget/button.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:stacked/stacked.dart';
 
@@ -45,10 +44,15 @@ class _ProfilePageState extends State<ProfilePage> {
     return ViewModelBuilder.reactive(
       disposeViewModel: false,
       viewModelBuilder: () => widget.loginViewModel,
-      onViewModelReady: (viewModel) async {
-        await viewModel.loadUser();
-        await _loadCounters();
+      onViewModelReady: (viewModel) {
         viewModel.viewContext = context;
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          if (!mounted) {
+            return;
+          }
+          await viewModel.loadUser();
+          await _loadCounters();
+        });
       },
       builder: (context, viewModel, child) {
         final isSingleLine = AppSP.get(AppSPKey.loaiCheckin) == '1L';
@@ -114,6 +118,27 @@ class _ProfilePageState extends State<ProfilePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
+                              'Mã khách hàng',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: AppFontSize.sizeSmall,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Card(
+                                color:
+                                    AppColor.extraColor.withValues(alpha: 0.85),
+                                elevation: 4.0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: ListTile(
+                                    leading: const Icon(Icons.account_circle),
+                                    title: Text(
+                                        viewModel.userLogin?.maKhachHang ??
+                                            ''))),
+                            SizedBox(height: 10),
+                            Text(
                               'Mã sự kiện',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -122,7 +147,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             const SizedBox(height: 10),
                             Card(
-                                color: AppColor.extraColor.withOpacity(0.85),
+                                color:
+                                    AppColor.extraColor.withValues(alpha: 0.85),
                                 elevation: 4.0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.0),
@@ -141,7 +167,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             const SizedBox(height: 10),
                             Card(
-                                color: AppColor.extraColor.withOpacity(0.85),
+                                color:
+                                    AppColor.extraColor.withValues(alpha: 0.85),
                                 elevation: 4.0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.0),
@@ -172,7 +199,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               const SizedBox(height: 10),
                               Card(
-                                color: AppColor.extraColor.withOpacity(0.85),
+                                color:
+                                    AppColor.extraColor.withValues(alpha: 0.85),
                                 elevation: 4.0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.0),
@@ -197,7 +225,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             const SizedBox(height: 10),
                             Card(
-                              color: AppColor.extraColor.withOpacity(0.85),
+                              color:
+                                  AppColor.extraColor.withValues(alpha: 0.85),
                               elevation: 4.0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0),
@@ -224,7 +253,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             const SizedBox(height: 10),
                             Card(
-                              color: AppColor.extraColor.withOpacity(0.85),
+                              color:
+                                  AppColor.extraColor.withValues(alpha: 0.85),
                               elevation: 4.0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0),

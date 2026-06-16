@@ -14,17 +14,26 @@ class StatisticsRequest {
     final bool isSingleCheckin = loaiCheckin == '1L';
     final String endpoint =
         isSingleCheckin ? Api.getThongKe_1L : Api.getThongKe_NL;
+    final String url = '${Api.hostApi}$endpoint';
+
+    print(
+      'Get statistics request: url=$url, queryParameters=$body, loaiCheckin=$loaiCheckin',
+    );
 
     try {
       final response = await ApiService().getUsers(
-        '${Api.hostApi}$endpoint',
+        url,
         queryParameters: body,
       );
+
+      print('Get statistics response status: ${response.statusCode}');
+      print('Get statistics response data: ${response.data}');
 
       if (response.statusCode == 200) {
         final data = response.data;
         if (data is Map<String, dynamic> && data['LThongke'] is List) {
           final items = data['LThongke'] as List<dynamic>;
+          print('Get statistics parsed items count: ${items.length}');
           return items
               .map(
                 (item) => StatisticGroup.fromJson(

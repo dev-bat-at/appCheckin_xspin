@@ -1,5 +1,3 @@
-import 'package:checkin/app/app_sp.dart';
-import 'package:checkin/app/app_sp_key.dart';
 import 'package:checkin/base/base_page.dart';
 import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/model/statistics.model.dart';
@@ -18,10 +16,18 @@ class StatisticsPage extends StatefulWidget {
 class _StatisticsPageState extends State<StatisticsPage> {
   final StatisticsViewModel _viewModel = StatisticsViewModel();
 
+  // void _openTabletDemo() {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => const StatisticsTabletDemoPage(),
+  //     ),
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
     const background = Color(0xFFF8F3F1);
-    const deepRose = Color(0xFF7A1621);
 
     return ViewModelBuilder<StatisticsViewModel>.reactive(
       disposeViewModel: false,
@@ -30,11 +36,17 @@ class _StatisticsPageState extends State<StatisticsPage> {
         await viewModel.loadStatistics();
       },
       builder: (context, viewModel, child) {
+        final mediaQuery = MediaQuery.of(context);
+        final isTablet = mediaQuery.size.shortestSide >= 600;
+        final listPadding = EdgeInsets.symmetric(
+          horizontal: isTablet ? 24 : 16,
+          vertical: isTablet ? 20 : 16,
+        );
         final overview = viewModel.overview;
         final summary = overview?.thongKe;
 
         return BasePage(
-          title: 'Báo Cáo Check-in',
+          title: 'Thống kê',
           showLogo: true,
           body: Container(
             decoration: const BoxDecoration(
@@ -58,91 +70,111 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       ),
                     )
                   : ListView(
-                      padding: const EdgeInsets.all(16),
+                      padding: listPadding,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(18),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColor.primaryColor,
-                                deepRose,
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColor.primaryColor
-                                    .withValues(alpha: 0.16),
-                                blurRadius: 18,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Tổng quan sự kiện',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 20,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Thống kê theo ${viewModel.isSingleCheckin ? 'check-in 1 lần' : 'nhiều lượt check-in'} cho sự kiện ${AppSP.get(AppSPKey.tenTK) ?? ''}.',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.88),
-                                  height: 1.4,
-                                ),
-                              ),
-                              if ((AppSP.get(AppSPKey.tenLineCheckin) ?? '')
-                                  .isNotEmpty) ...[
-                                const SizedBox(height: 14),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 10,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.12),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.alt_route_rounded,
-                                        color: Colors.white,
-                                        size: 18,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          'Line hiện tại: ${AppSP.get(AppSPKey.tenLineCheckin) ?? ''}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 18),
+                        // Align(
+                        //   alignment: Alignment.centerRight,
+                        //   child: OutlinedButton.icon(
+                        //     onPressed: _openTabletDemo,
+                        //     icon: const Icon(Icons.tablet_mac_outlined),
+                        //     label: const Text('Demo tablet'),
+                        //     style: OutlinedButton.styleFrom(
+                        //       foregroundColor: AppColor.primaryColor,
+                        //       side: BorderSide(
+                        //         color: AppColor.primaryColor.withValues(
+                        //           alpha: 0.35,
+                        //         ),
+                        //       ),
+                        //       padding: EdgeInsets.symmetric(
+                        //         horizontal: isTablet ? 18 : 14,
+                        //         vertical: 12,
+                        //       ),
+                        //       backgroundColor: Colors.white.withValues(
+                        //         alpha: 0.92,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                        // SizedBox(height: isTablet ? 18 : 14),
+                        // Container(
+                        //   padding: const EdgeInsets.all(18),
+                        //   decoration: BoxDecoration(
+                        //     gradient: LinearGradient(
+                        //       colors: [
+                        //         AppColor.primaryColor,
+                        //         deepRose,
+                        //       ],
+                        //     ),
+                        //     borderRadius: BorderRadius.circular(24),
+                        //     boxShadow: [
+                        //       BoxShadow(
+                        //         color: AppColor.primaryColor
+                        //             .withValues(alpha: 0.16),
+                        //         blurRadius: 18,
+                        //         offset: const Offset(0, 10),
+                        //       ),
+                        //     ],
+                        //   ),
+                        //   child: Column(
+                        //     crossAxisAlignment: CrossAxisAlignment.start,
+                        //     children: [
+                        //       // const Text(
+                        //       //   'Tổng quan sự kiện',
+                        //       //   style: TextStyle(
+                        //       //     color: Colors.white,
+                        //       //     fontWeight: FontWeight.w800,
+                        //       //     fontSize: 20,
+                        //       //   ),
+                        //       // ),
+                        //       // const SizedBox(height: 8),
+                        //       // Text(
+                        //       //   'Thống kê theo ${viewModel.isSingleCheckin ? 'check-in 1 lần' : 'nhiều lượt check-in'} cho sự kiện ${AppSP.get(AppSPKey.tenTK) ?? ''}.',
+                        //       //   style: TextStyle(
+                        //       //     color: Colors.white.withValues(alpha: 0.88),
+                        //       //     height: 1.4,
+                        //       //   ),
+                        //       // ),
+                        //       // if ((AppSP.get(AppSPKey.tenLineCheckin) ?? '')
+                        //       //     .isNotEmpty) ...[
+                        //       //   const SizedBox(height: 14),
+                        //       //   Container(
+                        //       //     padding: const EdgeInsets.symmetric(
+                        //       //       horizontal: 12,
+                        //       //       vertical: 10,
+                        //       //     ),
+                        //       //     decoration: BoxDecoration(
+                        //       //       color: Colors.white.withValues(alpha: 0.12),
+                        //       //       borderRadius: BorderRadius.circular(16),
+                        //       //     ),
+                        //       //     child: Row(
+                        //       //       children: [
+                        //       //         const Icon(
+                        //       //           Icons.alt_route_rounded,
+                        //       //           color: Colors.white,
+                        //       //           size: 18,
+                        //       //         ),
+                        //       //         const SizedBox(width: 8),
+                        //       //         Expanded(
+                        //       //           child: Text(
+                        //       //             'Line hiện tại: ${AppSP.get(AppSPKey.tenLineCheckin) ?? ''}',
+                        //       //             style: const TextStyle(
+                        //       //               color: Colors.white,
+                        //       //               fontWeight: FontWeight.w700,
+                        //       //             ),
+                        //       //           ),
+                        //       //         ),
+                        //       //       ],
+                        //       //     ),
+                        //       //   ),
+                        //       // ],
+                        //     ],
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 18),
                         if (summary != null)
                           _StatisticMetricsCard(
                             summary: summary,
                             isSingleCheckin: viewModel.isSingleCheckin,
-                          )
-                        else
-                          const _EmptyState(
-                            message: 'Chưa có dữ liệu thống kê để hiển thị',
                           ),
                         const SizedBox(height: 16),
                         if (viewModel.groupedStatistics.isNotEmpty) ...[
@@ -154,10 +186,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                   isSingleCheckin: viewModel.isSingleCheckin,
                                 ),
                               ),
-                        ] else if (!viewModel.isBusy) ...[
-                          const _EmptyState(
-                            message: 'Chưa có nhóm thống kê chi tiết',
-                          ),
                         ],
                       ],
                     ),
@@ -193,6 +221,23 @@ class _StatisticMetricsCard extends StatelessWidget {
               color: const Color(0xFFD8941A),
             ),
             _MetricTextData(
+              label: 'Đã check in',
+              value: summary.daCheckin,
+              color: const Color(0xFF17823B),
+            ),
+            _MetricTextData(
+              label: 'Chưa check-in',
+              value: summary.chuaCheckin,
+              color: const Color(0xFFD81B1B),
+            ),
+          ]
+        : <_MetricTextData>[
+            _MetricTextData(
+              label: 'Tổng người tham dự',
+              value: summary.tongNguoiThamDu,
+              color: const Color(0xFFD8941A),
+            ),
+            _MetricTextData(
               label: 'Đã check-in xong',
               value: summary.daCheckinXong,
               color: const Color(0xFF17823B),
@@ -207,119 +252,169 @@ class _StatisticMetricsCard extends StatelessWidget {
               value: summary.chuaTungCheckin,
               color: const Color(0xFFD81B1B),
             ),
-          ]
-        : <_MetricTextData>[
-            _MetricTextData(
-              label: 'Tổng người tham dự',
-              value: summary.tongNguoiThamDu,
-              color: const Color(0xFFD8941A),
-            ),
-            _MetricTextData(
-              label: 'Đã check in',
-              value: summary.daCheckin,
-              color: const Color(0xFF17823B),
-            ),
-            _MetricTextData(
-              label: 'Chưa check in',
-              value: summary.chuaCheckin,
-              color: const Color(0xFFD81B1B),
-            ),
           ];
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade300),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 600;
+        final isSmallTablet =
+            constraints.maxWidth >= 600 && constraints.maxWidth < 900;
+        final contentMaxWidth =
+            isTablet ? (isSmallTablet ? 420.0 : 480.0) : null;
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: EdgeInsets.symmetric(
+            horizontal: isTablet ? (isSmallTablet ? 24 : 28) : 18,
+            vertical: isTablet ? (isSmallTablet ? 22 : 24) : 16,
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (hasTitle) ...[
-            Text(
-              index == null ? title!.trim() : '$index. ${title!.trim()}',
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 18,
-                color: Colors.black87,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
+            border: Border.all(color: Colors.grey.shade300),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 10,
+                offset: const Offset(0, 5),
               ),
-            ),
-            const SizedBox(height: 10),
-          ],
-          Wrap(
-            spacing: 18,
-            runSpacing: 10,
-            alignment: hasTitle ? WrapAlignment.start : WrapAlignment.center,
-            children: metrics
-                .map<Widget>(
-                  (metric) => RichText(
-                    text: TextSpan(
-                      style: DefaultTextStyle.of(context).style,
-                      children: [
-                        TextSpan(
-                          text: '${metric.label}: ',
-                          style: TextStyle(
-                            color: metric.color,
-                            fontWeight: FontWeight.w700,
-                            fontSize: hasTitle ? 16 : 17,
-                          ),
-                        ),
-                        TextSpan(
-                          text: '${metric.value}',
-                          style: TextStyle(
-                            color: metric.color,
-                            fontWeight: FontWeight.w800,
-                            fontSize: hasTitle ? 16 : 17,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-                .toList(),
+            ],
           ),
-        ],
-      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (hasTitle) ...[
+                Text(
+                  index == null ? title!.trim() : '$index. ${title!.trim()}',
+                  textAlign: isTablet ? TextAlign.center : TextAlign.start,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: isTablet ? (isSmallTablet ? 20 : 18) : 18,
+                    color: Colors.black87,
+                  ),
+                ),
+                SizedBox(height: isTablet ? 16 : 10),
+              ],
+              if (isTablet)
+                Row(
+                  children: metrics
+                      .asMap()
+                      .entries
+                      .map<Widget>(
+                        (entry) => Expanded(
+                          child: _TabletMetricItem(
+                            metric: entry.value,
+                            emphasize: !hasTitle,
+                            isSmallTablet: isSmallTablet,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                )
+              else
+                Column(
+                  children: metrics
+                      .asMap()
+                      .entries
+                      .map<Widget>(
+                        (entry) => Padding(
+                          padding: EdgeInsets.only(
+                            bottom: entry.key == metrics.length - 1 ? 0 : 0,
+                          ),
+                          child: _PhoneMetricItem(
+                            metric: entry.value,
+                            emphasize: !hasTitle,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
 
-class _EmptyState extends StatelessWidget {
-  const _EmptyState({
-    required this.message,
+class _TabletMetricItem extends StatelessWidget {
+  const _TabletMetricItem({
+    required this.metric,
+    required this.emphasize,
+    required this.isSmallTablet,
   });
 
-  final String message;
+  final _MetricTextData metric;
+  final bool emphasize;
+  final bool isSmallTablet;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          metric.label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: metric.color,
+            fontWeight: FontWeight.w600,
+            fontSize: emphasize ? 16 : 14,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          '${metric.value}',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: metric.color,
+            fontWeight: FontWeight.w700,
+            fontSize: emphasize ? 18 : 16,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PhoneMetricItem extends StatelessWidget {
+  const _PhoneMetricItem({
+    required this.metric,
+    required this.emphasize,
+  });
+
+  final _MetricTextData metric;
+  final bool emphasize;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          Icon(Icons.insights_outlined, color: Colors.grey[600]),
-          const SizedBox(width: 12),
           Expanded(
             child: Text(
-              message,
+              metric.label,
               style: TextStyle(
-                color: Colors.grey[700],
-                fontWeight: FontWeight.w600,
+                color: metric.color,
+                fontWeight: FontWeight.w700,
+                fontSize: emphasize ? 15 : 14,
               ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            '${metric.value}',
+            maxLines: 1,
+            softWrap: false,
+            style: TextStyle(
+              color: metric.color,
+              fontWeight: FontWeight.w800,
+              fontSize: emphasize ? 18 : 16,
             ),
           ),
         ],

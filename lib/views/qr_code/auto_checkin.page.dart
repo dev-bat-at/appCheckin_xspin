@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:checkin/app/app_route_observer.dart';
 import 'package:checkin/constants/app_color.dart';
@@ -12,9 +13,6 @@ import 'package:checkin/views/qr_code/scan_window_barcode_filter.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:stacked/stacked.dart';
-
-const _defaultAutoCheckinBackgroundUrl =
-    'https://xspin.vn/images/phan-mem-check-in.jpg';
 
 class AutoCheckinPage extends StatefulWidget {
   const AutoCheckinPage({
@@ -31,6 +29,7 @@ class AutoCheckinPage extends StatefulWidget {
 class _AutoCheckinPageState extends State<AutoCheckinPage>
     with WidgetsBindingObserver, RouteAware {
   final QRCodeViewModel _qrViewModel = QRCodeViewModel();
+  final TextEditingController _demoQRCodeController = TextEditingController();
   ModalRoute<dynamic>? _route;
 
   @override
@@ -70,6 +69,7 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
     }
     _qrViewModel.unbindScannerPage();
     unawaited(_qrViewModel.disposeScanner());
+    _demoQRCodeController.dispose();
     super.dispose();
   }
 
@@ -113,11 +113,27 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
     await _qrViewModel.startScannerSafely();
   }
 
+  void _scheduleScannerWarmup() {
+    for (final delay in const [
+      Duration(milliseconds: 250),
+      Duration(milliseconds: 700),
+    ]) {
+      Future<void>.delayed(delay, () {
+        if (!mounted) {
+          return;
+        }
+        unawaited(_resumeScannerIfVisible());
+      });
+    }
+  }
+
   CameraFacing _resolveCameraFacing(String? cameraSetting) {
     switch (cameraSetting?.trim()) {
-      case 'CameraSau':
-        return CameraFacing.back;
-      case 'CameraTruoc':
+      // case 'CameraSau':
+      //   return CameraFacing.back;
+      // case 'CameraTruoc':
+      // default:
+      //   return CameraFacing.front;
       default:
         return CameraFacing.front;
     }
@@ -159,6 +175,7 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
         widgetSize: previewSize,
         scanWindow: scanWindow,
         fit: BoxFit.cover,
+        mirrorHorizontally: _qrViewModel.isFrontCamera,
       );
     });
 
@@ -187,10 +204,13 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
         viewModel.bindScannerPage(context);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           unawaited(_resumeScannerIfVisible());
+          _scheduleScannerWarmup();
         });
       },
       builder: (context, viewModel, child) {
         viewModel.bindScannerPage(context);
+        final mediaQuery = MediaQuery.of(context);
+        final isTablet = mediaQuery.size.shortestSide >= 600;
 
         return Scaffold(
           backgroundColor: Colors.black,
@@ -200,9 +220,10 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
             builder: (context, loginViewModel, child) {
               return LayoutBuilder(
                 builder: (context, constraints) {
+                  final maxScanSize = isTablet ? 420.0 : 320.0;
                   final scanSize = math.min(
                     constraints.maxWidth * 0.76,
-                    320.0,
+                    maxScanSize,
                   );
                   final scanWindow = Rect.fromCenter(
                     center: Offset(
@@ -228,13 +249,7 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
                   return Stack(
                     fit: StackFit.expand,
                     children: [
-                      viewModel.isFrontCamera
-                          ? Transform(
-                              alignment: Alignment.center,
-                              transform: Matrix4.identity()..rotateY(math.pi),
-                              child: scanner,
-                            )
-                          : scanner,
+                      scanner,
                       _AutoCheckinBackgroundLayer(
                         imageQr: loginViewModel.userLogin?.imageQr,
                         cutoutRect: scanWindow,
@@ -261,19 +276,12 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
                                 child: Ink(
                                   width: 42,
                                   height: 42,
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withValues(alpha: 0.42),
-                                    borderRadius: BorderRadius.circular(18),
-                                    border: Border.all(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.14,
-                                      ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(9),
+                                    child: Image.asset(
+                                      'assets/logo_close.png',
+                                      fit: BoxFit.contain,
                                     ),
-                                  ),
-                                  child: const Icon(
-                                    Icons.close_rounded,
-                                    color: Colors.white,
-                                    size: 20,
                                   ),
                                 ),
                               ),
@@ -281,6 +289,17 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
                           ),
                         ),
                       ),
+                      // Positioned(
+                      //   left: 16,
+                      //   right: 16,
+                      //   bottom: bottomInset + 18,
+                      //   child: _AutoDemoQRCodeInput(
+                      //     controller: _demoQRCodeController,
+                      //     isBusy: viewModel.isBusy,
+                      //     isTablet: isTablet,
+                      //     onSubmitted: () => _submitDemoQRCode(viewModel),
+                      //   ),
+                      // ),
                     ],
                   );
                 },
@@ -292,6 +311,94 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
     );
   }
 }
+
+// class _AutoDemoQRCodeInput extends StatelessWidget {
+//   const _AutoDemoQRCodeInput({
+//     required this.controller,
+//     required this.isBusy,
+//     required this.isTablet,
+//     required this.onSubmitted,
+//   });
+
+//   final TextEditingController controller;
+//   final bool isBusy;
+//   final bool isTablet;
+//   final VoidCallback onSubmitted;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Center(
+//       child: ConstrainedBox(
+//         constraints: BoxConstraints(maxWidth: isTablet ? 620 : double.infinity),
+//         child: Material(
+//           color: Colors.black.withValues(alpha: 0.64),
+//           borderRadius: BorderRadius.circular(16),
+//           child: Padding(
+//             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+//             child: Row(
+//               children: [
+//                 // Expanded(
+//                 //   child: TextField(
+//                 //     controller: controller,
+//                 //     enabled: !isBusy,
+//                 //     keyboardType: TextInputType.number,
+//                 //     textInputAction: TextInputAction.done,
+//                 //     onSubmitted: (_) => onSubmitted(),
+//                 //     style: const TextStyle(color: Colors.white),
+//                 //     decoration: InputDecoration(
+//                 //       isDense: true,
+//                 //       hintText: 'Nhập mã QR demo',
+//                 //       hintStyle: TextStyle(
+//                 //         color: Colors.white.withValues(alpha: 0.76),
+//                 //       ),
+//                 //       prefixIcon: const Icon(
+//                 //         Icons.qr_code_2_rounded,
+//                 //         color: Colors.white,
+//                 //       ),
+//                 //       filled: true,
+//                 //       fillColor: Colors.white.withValues(alpha: 0.12),
+//                 //       border: OutlineInputBorder(
+//                 //         borderRadius: BorderRadius.circular(12),
+//                 //         borderSide: BorderSide.none,
+//                 //       ),
+//                 //       contentPadding: const EdgeInsets.symmetric(
+//                 //         horizontal: 12,
+//                 //         vertical: 12,
+//                 //       ),
+//                 //     ),
+//                 //   ),
+//                 // ),
+//                 const SizedBox(width: 10),
+//                 ElevatedButton(
+//                   onPressed: isBusy ? null : onSubmitted,
+//                   style: ElevatedButton.styleFrom(
+//                     backgroundColor: AppColor.successQRCode,
+//                     foregroundColor: Colors.white,
+//                     disabledBackgroundColor: Colors.grey.shade500,
+//                     padding: const EdgeInsets.symmetric(
+//                       horizontal: 18,
+//                       vertical: 13,
+//                     ),
+//                     shape: RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.circular(12),
+//                     ),
+//                   ),
+//                   child: Text(
+//                     isBusy ? 'Đang gửi' : 'Demo',
+//                     style: TextStyle(
+//                       fontSize: AppFontSize.sizeSmall,
+//                       fontWeight: FontWeight.w800,
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class _ScanGuideFrame extends StatelessWidget {
   const _ScanGuideFrame({
@@ -350,20 +457,62 @@ class _AutoCheckinBackgroundLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundImage = _buildImageContent();
+    final backgroundImage = _buildImageProvider();
+    final hasBackgroundImage = backgroundImage != null;
+
     return IgnorePointer(
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (backgroundImage != null)
+          if (hasBackgroundImage)
             ClipPath(
               clipper: _InvertedCutoutClipper(cutoutRect),
-              child: backgroundImage,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ImageFiltered(
+                    imageFilter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        image: DecorationImage(
+                          image: backgroundImage,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      child: const SizedBox.expand(),
+                    ),
+                  ),
+                  ColoredBox(
+                    color: Colors.black.withValues(alpha: 0.16),
+                  ),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: backgroundImage,
+                        fit: BoxFit.contain,
+                        alignment: Alignment.center,
+                      ),
+                    ),
+                    child: const SizedBox.expand(),
+                  ),
+                ],
+              ),
+            ),
+          if (!hasBackgroundImage)
+            ClipPath(
+              clipper: _InvertedCutoutClipper(cutoutRect),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                child: Container(
+                  color: Colors.black.withValues(alpha: 0.28),
+                ),
+              ),
             ),
           CustomPaint(
             painter: _ScannerOverlayPainter(
               cutoutRect,
-              overlayColor: backgroundImage == null
+              overlayColor: !hasBackgroundImage
                   ? Colors.black.withValues(alpha: 0.42)
                   : Colors.black.withValues(alpha: 0.18),
             ),
@@ -374,29 +523,19 @@ class _AutoCheckinBackgroundLayer extends StatelessWidget {
     );
   }
 
-  Widget? _buildImageContent() {
-    final rawImage = (imageQr?.trim().isNotEmpty ?? false)
-        ? imageQr!.trim()
-        : _defaultAutoCheckinBackgroundUrl;
+  ImageProvider<Object>? _buildImageProvider() {
+    final rawImage = imageQr?.trim() ?? '';
     if (rawImage.isEmpty) {
       return null;
     }
 
     if (rawImage.startsWith('http://') || rawImage.startsWith('https://')) {
-      return Image.network(
-        rawImage,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
-      );
+      return NetworkImage(rawImage);
     }
 
     final bytes = _tryDecodeImage(rawImage);
     if (bytes != null) {
-      return Image.memory(
-        bytes,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
-      );
+      return MemoryImage(bytes);
     }
 
     return null;
