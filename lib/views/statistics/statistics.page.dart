@@ -1,3 +1,4 @@
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/base/base_page.dart';
 import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/model/statistics.model.dart';
@@ -46,7 +47,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
         final summary = overview?.thongKe;
 
         return BasePage(
-          title: 'Thống kê',
+          title: AppLanguage.getText('ThongKe'),
           showLogo: true,
           body: Container(
             decoration: const BoxDecoration(
@@ -216,39 +217,39 @@ class _StatisticMetricsCard extends StatelessWidget {
     final metrics = isSingleCheckin
         ? <_MetricTextData>[
             _MetricTextData(
-              label: 'Tổng người tham dự',
+              label: AppLanguage.getText('TongNguoiThamDu'),
               value: summary.tongNguoiThamDu,
               color: const Color(0xFFD8941A),
             ),
             _MetricTextData(
-              label: 'Đã check in',
+              label: AppLanguage.getText('DaCheckin'),
               value: summary.daCheckin,
               color: const Color(0xFF17823B),
             ),
             _MetricTextData(
-              label: 'Chưa check-in',
+              label: AppLanguage.getText('ChuaCheckin'),
               value: summary.chuaCheckin,
               color: const Color(0xFFD81B1B),
             ),
           ]
         : <_MetricTextData>[
             _MetricTextData(
-              label: 'Tổng người tham dự',
+              label: AppLanguage.getText('TongNguoiThamDu'),
               value: summary.tongNguoiThamDu,
               color: const Color(0xFFD8941A),
             ),
             _MetricTextData(
-              label: 'Đã check-in xong',
+              label: AppLanguage.getText('DaCheckinXong'),
               value: summary.daCheckinXong,
               color: const Color(0xFF17823B),
             ),
             _MetricTextData(
-              label: 'Đang check-in',
+              label: AppLanguage.getText('DangCheckin'),
               value: summary.dangCheckin,
               color: const Color(0xFFE58A2C),
             ),
             _MetricTextData(
-              label: 'Chưa từng check-in',
+              label: AppLanguage.getText('ChuaTungCheckin'),
               value: summary.chuaTungCheckin,
               color: const Color(0xFFD81B1B),
             ),

@@ -3,6 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:checkin/views/qr_code/widgets/failed_qr.widget.dart';
 import 'package:flutter/material.dart';
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/app/app_sp.dart';
 import 'package:checkin/app/app_sp_key.dart';
 
@@ -306,12 +307,12 @@ class QRCodeViewModel extends BaseViewModel {
 
     switch (status) {
       case 0:
-        return 'QR Code không hợp lệ!';
+        return AppLanguage.getText('QRCodeKhongHopLe');
       case -1:
       case -2:
-        return 'Check-in thất bại. Bạn vui lòng liên hệ admin để xử lý!!';
+        return AppLanguage.getText('CheckinThatBaiLienHeAdmin');
       default:
-        return 'Check-in thất bại. Bạn vui lòng liên hệ admin để xử lý!!';
+        return AppLanguage.getText('CheckinThatBaiLienHeAdmin');
     }
   }
 
@@ -333,7 +334,7 @@ class QRCodeViewModel extends BaseViewModel {
     await _showResultPage(
       FailedQrCode(
         qrCodeViewModel: this,
-        title: 'Thông báo',
+        title: AppLanguage.getText('ThongBao'),
         desc: description,
       ),
     );
@@ -400,24 +401,23 @@ class QRCodeViewModel extends BaseViewModel {
           }
         } else {
           final desc = AppSP.get(AppSPKey.loaiCheckin) == 'NL'
-              ? 'Mã QR $qrCode đã hết lượt check-in!'
-              : 'Mã QR $qrCode đã được check-in rồi!';
+              ? '${AppLanguage.getText('MaQR')} $qrCode ${AppLanguage.getText('DaHetLuotCheckin')}'
+              : '${AppLanguage.getText('MaQR')} $qrCode ${AppLanguage.getText('DaDuocCheckinRoi')}';
           await _showFailedResult(desc, flowMode: flowMode);
         }
       } else {
         await _showFailedResult(
-          'QR Code không hợp lệ!',
+          AppLanguage.getText('QRCodeKhongHopLe'),
           flowMode: flowMode,
         );
       }
     } catch (e) {
       String errorMessage = _normalizeErrorMessage(e);
       if (errorMessage.isEmpty) {
-        errorMessage = 'QR Code không hợp lệ!';
+        errorMessage = AppLanguage.getText('QRCodeKhongHopLe');
       }
       if (errorMessage.contains('Lỗi kết nối internet')) {
-        errorMessage =
-            'Lỗi kết nối internet. Vui lòng kiểm tra Wi-Fi hoặc dữ liệu di động.';
+        errorMessage = AppLanguage.getText('LoiKetNoiInternet');
       }
 
       await _showFailedResult(
@@ -473,8 +473,9 @@ class QRCodeViewModel extends BaseViewModel {
             )
           : FailedQrCode(
               qrCodeViewModel: this,
-              title: 'Thông báo',
-              desc: description ?? 'Vui lòng thử lại với mã QR khác.',
+              title: AppLanguage.getText('ThongBao'),
+              desc: description ??
+                  AppLanguage.getText('VuiLongThuLaiVoiMaQRKhac'),
               autoClose: true,
             ),
       restartScannerAfterClose: true,
@@ -486,7 +487,7 @@ class QRCodeViewModel extends BaseViewModel {
       context: context,
       dialogType: DialogType.info,
       animType: AnimType.topSlide,
-      title: 'Mã đã quét',
+      title: AppLanguage.getText('MaDaQuet'),
       desc: desc,
       btnOkOnPress: () {
         unawaited(startScannerSafely());
@@ -501,7 +502,7 @@ class QRCodeViewModel extends BaseViewModel {
       context: context,
       dialogType: DialogType.error,
       animType: AnimType.topSlide,
-      title: 'QRCode Không tồn tại',
+      title: AppLanguage.getText('QRCodeKhongTonTai'),
       desc: desc,
       btnOkOnPress: () {
         unawaited(startScannerSafely());

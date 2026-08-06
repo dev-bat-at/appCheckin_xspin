@@ -1,3 +1,4 @@
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/app/app_sp.dart';
 import 'package:checkin/app/app_sp_key.dart';
 import 'package:checkin/constants/app_color.dart';
@@ -62,7 +63,9 @@ class _LineSelectionPageState extends State<LineSelectionPage> {
   Future<void> _confirmSelection() async {
     if (_selectedLineId == null || _selectedLineId!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng chọn line check-in')),
+        SnackBar(
+            content:
+                Text(AppLanguage.getText('BanVuiLongChonLineCheckinPhuHop'))),
       );
       return;
     }
@@ -131,8 +134,11 @@ class _LineSelectionPageState extends State<LineSelectionPage> {
               )
             : null,
         title: Text(
-          widget.allowBack ? 'Đổi Line Check-in' : 'Chọn Line Check-in',
+          widget.allowBack
+              ? AppLanguage.getText('DoiLine')
+              : AppLanguage.getText('LineCheckin'),
           style: const TextStyle(
+            fontFamily: 'Inter',
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -200,9 +206,10 @@ class _LineSelectionPageState extends State<LineSelectionPage> {
                             const SizedBox(height: 16),
                             Text(
                               widget.allowBack
-                                  ? 'Đổi quầy check-in'
-                                  : 'Chọn quầy check-in',
+                                  ? AppLanguage.getText('DoiLine')
+                                  : AppLanguage.getText('LineCheckin'),
                               style: TextStyle(
+                                fontFamily: 'Inter',
                                 fontSize: AppFontSize.sizeLarge,
                                 fontWeight: FontWeight.w800,
                                 color: Colors.white,
@@ -210,43 +217,35 @@ class _LineSelectionPageState extends State<LineSelectionPage> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Bạn vui lòng chọn line check-in phù hợp',
+                              AppLanguage.getText(
+                                  'BanVuiLongChonLineCheckinPhuHop'),
                               style: TextStyle(
+                                fontFamily: 'Inter',
                                 fontSize: AppFontSize.sizeSmall,
                                 color: Colors.white.withValues(alpha: 0.88),
                                 height: 1.45,
                               ),
                             ),
                             if ((AppSP.get(AppSPKey.tenTK) ?? '')
+                                .toString()
                                 .isNotEmpty) ...[
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 12),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 10,
+                                  horizontal: 10,
+                                  vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(14),
                                 ),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.confirmation_num_outlined,
-                                      color: Colors.white,
-                                      size: 18,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        'Sự kiện: ${AppSP.get(AppSPKey.tenTK) ?? ''}',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                child: Text(
+                                  '${AppLanguage.getText('SuKien')}: ${AppSP.get(AppSPKey.tenTK) ?? ''}',
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ],
@@ -259,8 +258,9 @@ class _LineSelectionPageState extends State<LineSelectionPage> {
                         child: Row(
                           children: [
                             Text(
-                              'Danh sách line',
+                              AppLanguage.getText('DanhSachLine'),
                               style: TextStyle(
+                                fontFamily: 'Inter',
                                 fontSize: AppFontSize.sizeMedium,
                                 fontWeight: FontWeight.w800,
                                 color: accentDark,
@@ -279,6 +279,7 @@ class _LineSelectionPageState extends State<LineSelectionPage> {
                               child: Text(
                                 '${_lines.length} line',
                                 style: TextStyle(
+                                  fontFamily: 'Inter',
                                   color: accentDark,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -294,11 +295,12 @@ class _LineSelectionPageState extends State<LineSelectionPage> {
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Text('Chưa có line check-in để chọn'),
+                                    Text(AppLanguage.getText('ChuaCoLine')),
                                     const SizedBox(height: 12),
                                     ElevatedButton(
                                       onPressed: _loadLines,
-                                      child: const Text('Tải lại'),
+                                      child:
+                                          Text(AppLanguage.getText('TaiLai')),
                                     ),
                                   ],
                                 ),
@@ -477,9 +479,11 @@ class _LineSelectionPageState extends State<LineSelectionPage> {
                                   )
                                 : Text(
                                     widget.allowBack
-                                        ? 'Lưu thay đổi line'
-                                        : 'Xác nhận line check-in',
+                                        ? AppLanguage.getText('LuuThayDoiLine')
+                                        : AppLanguage.getText(
+                                            'XacNhanLineCheckin'),
                                     style: const TextStyle(
+                                      fontFamily: 'Inter',
                                       color: Colors.white,
                                       fontWeight: FontWeight.w800,
                                     ),
@@ -495,8 +499,11 @@ class _LineSelectionPageState extends State<LineSelectionPage> {
                               ? () => Navigator.maybePop(context)
                               : _logout,
                           child: Text(
-                            widget.allowBack ? 'Hủy' : 'Đăng xuất',
+                            widget.allowBack
+                                ? AppLanguage.getText('Huy')
+                                : AppLanguage.getText('DangXuat'),
                             style: TextStyle(
+                              fontFamily: 'Inter',
                               color: accentDark,
                               fontWeight: FontWeight.w700,
                             ),

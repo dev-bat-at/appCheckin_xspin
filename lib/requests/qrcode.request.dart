@@ -1,3 +1,4 @@
+import 'package:checkin/app/app_language.dart';
 import 'package:dio/dio.dart';
 import 'package:checkin/constants/api.dart';
 import 'package:checkin/model/user.model.dart';
@@ -85,7 +86,7 @@ class QRCodeRequest {
           .QrCode('${Api.hostApi}$apiPath', queryParameters: body)
           .timeout(Duration(seconds: 10), onTimeout: () {
         throw TimeoutException(
-            'Yêu cầu mất quá nhiều thời gian, kiểm tra kết nối mạng.');
+            AppLanguage.getText('LoiKetNoiInternet'));
       });
       print('Check-in response statusCode: ${response.statusCode}');
       print('Check-in response data: ${response.data}');
@@ -118,7 +119,7 @@ class QRCodeRequest {
       }
     } catch (e) {
       print('Check-in error: $e');
-      throw Exception('Có sự cố với kết nối internet vui lòng kiểm tra lại');
+      throw Exception(AppLanguage.getText('LoiKetNoiInternet'));
     }
   }
 
@@ -146,10 +147,10 @@ class QRCodeRequest {
         print('status data: ${data['Status']}');
         final status = _parseStatus(data['Status']);
         if (status != null && status <= 0) {
-          throw Exception(_parseMessage(data) ?? 'QR Code không hợp lệ!');
+          throw Exception(_parseMessage(data) ?? AppLanguage.getText('QRCodeKhongHopLe'));
         }
         if (!_looksLikeUserPayload(data)) {
-          throw Exception(_parseMessage(data) ?? 'QR Code không hợp lệ!');
+          throw Exception(_parseMessage(data) ?? AppLanguage.getText('QRCodeKhongHopLe'));
         }
 
         final qrCodeResponse = Users.fromJson(data);
@@ -159,7 +160,7 @@ class QRCodeRequest {
       }
     } catch (e) {
       print('GetUser error: $e');
-      throw Exception('QR Code không hợp lệ!');
+      throw Exception(AppLanguage.getText('QRCodeKhongHopLe'));
     }
   }
 }

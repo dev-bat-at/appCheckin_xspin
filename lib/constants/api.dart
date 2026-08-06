@@ -37,6 +37,8 @@ class Api {
 
   static const getThongKe_1L = '/getThongKe_1L';
 
+  static const getListNgonNgu = '/getListNgonNgu';
+
   static const DaCheckin = 'Đã check-in';
   static const ChuaCheckin = 'Chưa check-in';
 }

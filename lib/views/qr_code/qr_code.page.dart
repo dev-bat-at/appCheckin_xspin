@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/app/app_route_observer.dart';
 import 'package:checkin/base/base_page.dart';
 import 'package:checkin/constants/app_color.dart';
@@ -119,7 +120,8 @@ class _QrCodePageState extends State<QrCodePage>
     final qrCode = _demoQRCodeController.text.trim();
     if (qrCode.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập mã QR demo')),
+        SnackBar(
+            content: Text(AppLanguage.getText('VuiLongNhapMaQRDemo'))),
       );
       return;
     }
@@ -239,7 +241,7 @@ class _QrCodePageState extends State<QrCodePage>
                         color: Colors.redAccent.withValues(alpha: 0.5),
                       ),
                       child: Text(
-                        'Hãy đưa mã QR vào giữa khung',
+                        AppLanguage.getText('HayDuaMaQRVaoGiuaKhung'),
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: AppFontSize.sizeSmall,
@@ -283,7 +285,7 @@ class _QrCodePageState extends State<QrCodePage>
               ],
             ),
           ),
-          title: 'Checkin QR Code',
+          title: AppLanguage.getText('CheckinQRCode'),
         );
       },
     );

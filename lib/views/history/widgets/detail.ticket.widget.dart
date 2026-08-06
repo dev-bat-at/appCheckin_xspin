@@ -1,3 +1,4 @@
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/base/base_page.dart';
 import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/constants/app_fontsize.dart';
@@ -37,7 +38,7 @@ class _DetailTicketState extends State<DetailTicket> {
       },
       builder: (context, loginViewModel, child) {
         return BasePage(
-          title: 'Mã QR: ${widget.user.maQR}',
+          title: '${AppLanguage.getText('MaQR')}: ${widget.user.maQR}',
           body: loginViewModel.isBusy
               ? Center(
                   child: LoadingAnimationWidget.threeRotatingDots(
@@ -97,7 +98,7 @@ class _DetailTicketState extends State<DetailTicket> {
                                       color: AppColor.successQRCode),
                                 )
                               : Text(
-                                  'QR chưa checkin',
+                                  AppLanguage.getText('ChuaCheckin'),
                                   style: TextStyle(
                                       fontSize: AppFontSize.sizeSmall,
                                       color: AppColor.selectColor,
@@ -109,7 +110,7 @@ class _DetailTicketState extends State<DetailTicket> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Số lượt checkin tối đa: ${widget.user.soLuotCheckIntoida}',
+                                '${AppLanguage.getText('LuotCheckinToiDa')}: ${widget.user.soLuotCheckIntoida}',
                                 style: TextStyle(
                                     fontSize: AppFontSize.sizeSmall,
                                     color: AppColor.oriColor,
@@ -119,7 +120,7 @@ class _DetailTicketState extends State<DetailTicket> {
                                 height: 15,
                               ),
                               Text(
-                                'Đã checkin: ${widget.user.dacheckIn}',
+                                '${AppLanguage.getText('DaCheckin')}: ${widget.user.dacheckIn}',
                                 style: TextStyle(
                                     fontSize: AppFontSize.sizeSmall,
                                     color: AppColor.successQRCode,
@@ -129,7 +130,7 @@ class _DetailTicketState extends State<DetailTicket> {
                                 height: 15,
                               ),
                               Text(
-                                'Chưa checkin: ${widget.user.chuaCheckin}',
+                                '${AppLanguage.getText('ChuaCheckin')}: ${widget.user.chuaCheckin}',
                                 style: TextStyle(
                                     fontSize: AppFontSize.sizeSmall,
                                     color: AppColor.primaryColor,
@@ -143,7 +144,7 @@ class _DetailTicketState extends State<DetailTicket> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Lịch sử checkin',
+                                AppLanguage.getText('LichSuCheckin'),
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: AppFontSize.sizeSmall,

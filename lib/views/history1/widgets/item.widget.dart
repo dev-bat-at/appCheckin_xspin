@@ -1,3 +1,4 @@
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/constants/api.dart';
 import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/constants/app_fontsize.dart';
@@ -82,14 +83,14 @@ class _ItemTicketQRState extends State<ItemTicket> {
                 children: [
                   widget.user.tinhTrang == Api.DaCheckin
                       ? Text(
-                          'Đã checkin',
+                          AppLanguage.getText('DaCheckin'),
                           style: TextStyle(
                               fontSize: AppFontSize.sizeSuperSmall,
                               fontWeight: FontWeight.bold,
                               color: AppColor.successQRCode),
                         )
                       : Text(
-                          'Chưa checkin',
+                          AppLanguage.getText('ChuaCheckin'),
                           style: TextStyle(
                               fontSize: AppFontSize.sizeSuperSmall,
                               fontWeight: FontWeight.bold,

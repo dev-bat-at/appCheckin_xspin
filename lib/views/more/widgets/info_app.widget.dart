@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:checkin/app/app_language.dart';
 import 'package:flutter/material.dart';
 import 'package:checkin/base/base_page.dart';
 import 'package:checkin/constants/app_color.dart';
@@ -10,7 +10,7 @@ class InfoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      title: 'Thông tin ứng dụng',
+      title: AppLanguage.getText('ThongTinUngDung'),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
@@ -19,7 +19,7 @@ class InfoApp extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Phiên bản ứng dụng",
+                  AppLanguage.getText('PhienBanUngDung'),
                   style: TextStyle(
                       fontSize: AppFontSize.sizeSmall,
                       fontWeight: AppFontWeight.bold),
@@ -37,7 +37,7 @@ class InfoApp extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Nhà phát triển ứng dụng",
+                  AppLanguage.getText('NhaPhatTrien'),
                   style: TextStyle(
                       fontSize: AppFontSize.sizeSmall,
                       fontWeight: AppFontWeight.bold),

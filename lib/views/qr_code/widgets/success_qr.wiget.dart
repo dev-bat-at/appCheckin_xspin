@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/app/app_sp.dart';
 import 'package:checkin/app/app_sp_key.dart';
 import 'package:checkin/constants/app_color.dart';
@@ -64,8 +65,7 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
         if (_isLoading && mounted) {
           setState(() {
             _isLoading = false;
-            _showSnackBar(
-                'Sự cố internet. Vui lòng thử lại.'); // Hiển thị SnackBar
+            _showSnackBar(AppLanguage.getText('SuCoInternet')); // Hiển thị SnackBar
           });
         }
       });
@@ -74,8 +74,8 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
             .getCountUserCheckIn()
             .timeout(
               Duration(seconds: 30),
-              onTimeout: () =>
-                  throw TimeoutException('Sự cố internet. Vui lòng thử lại.'),
+              onTimeout: () => throw TimeoutException(AppLanguage.getText(
+                  'SuCoInternet')),
             );
         await widget.qrCodeViewModel.indexViewModel.usersViewModel
             .getUsers()
@@ -135,8 +135,7 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
         if (_isLoading && mounted) {
           setState(() {
             _isLoading = false;
-            _showSnackBar(
-                'Sự cố internet. Vui lòng thử lại.'); // Hiển thị SnackBar
+            _showSnackBar(AppLanguage.getText('SuCoInternet')); // Hiển thị SnackBar
           });
         }
       });
@@ -145,8 +144,8 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
             .getUsers()
             .timeout(
               Duration(seconds: 30),
-              onTimeout: () =>
-                  throw TimeoutException('Sự cố internet. Vui lòng thử lại.'),
+              onTimeout: () => throw TimeoutException(AppLanguage.getText(
+                  'SuCoInternet')),
             );
         await widget.qrCodeViewModel.indexViewModel.usersViewModel
             .getCountUserCheckIn()
@@ -281,7 +280,7 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
                                             MainAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Mã QR:',
+                                            '${AppLanguage.getText('MaQR')}:',
                                             style: TextStyle(
                                               fontSize: qrFontSize,
                                               fontWeight: FontWeight.w900,
@@ -426,7 +425,7 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
                                     elevation: WidgetStateProperty.all(10),
                                   ),
                                   child: Text(
-                                    "TIẾP TỤC CHECK IN",
+                                    AppLanguage.getText('TiepTucCheckIn'),
                                     style: TextStyle(
                                       fontSize: buttonFontSize,
                                       fontWeight: FontWeight.bold,
@@ -462,7 +461,7 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
                                     elevation: WidgetStateProperty.all(10),
                                   ),
                                   child: Text(
-                                    "QUAY LẠI DANH SÁCH",
+                                    AppLanguage.getText('QuayLaiDanhSach'),
                                     style: TextStyle(
                                       fontSize: buttonFontSize,
                                       fontWeight: FontWeight.bold,

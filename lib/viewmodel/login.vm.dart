@@ -1,4 +1,5 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/app/app_sp.dart';
 import 'package:checkin/app/app_sp_key.dart';
 import 'package:checkin/constants/app_color.dart';
@@ -74,6 +75,7 @@ class LoginViewModel extends BaseViewModel {
         await AppSP.set(AppSPKey.isCheckinTuDong, data!.isCheckinTuDong ?? '');
         await AppSP.set(AppSPKey.idLineCheckin, '');
         await AppSP.set(AppSPKey.tenLineCheckin, '');
+        await AppLanguage.fetchLanguages(data!.idSuKien);
         print('Loại checkin ${AppSP.get(AppSPKey.loaiCheckin)}');
         print('${AppSP.get(AppSPKey.idSuKien)}');
 
@@ -86,13 +88,13 @@ class LoginViewModel extends BaseViewModel {
       } else {
         // Show error message when login fails
         showSignInFailedDialog(
-            context, 'Tài khoản không tồn tại hoặc mật khẩu không chính xác');
+            context, 'Account does not exist or password is incorrect');
       }
     } catch (e) {
       print('Login failed: $e');
       // print('${Api.hostApi}${Api.login}');
-      showSignInFailedDialog(context,
-          'Có lỗi xảy ra trong quá trình đăng nhập, vui lòng thử lại sau');
+      showSignInFailedDialog(
+          context, 'An error occurred during login, please try again later');
     }
     setBusy(false);
     notifyListeners();
@@ -104,10 +106,10 @@ class LoginViewModel extends BaseViewModel {
       dialogType: DialogType.question,
       animType: AnimType.topSlide,
       showCloseIcon: true,
-      title: 'Thông báo!',
-      desc: 'Bạn có muốn đăng xuất ứng dụng?',
+      title: AppLanguage.getText('ThongBao'),
+      desc: AppLanguage.getText('BanCoMuonDangXuat'),
       btnCancelOnPress: () {},
-      btnCancelText: 'Hủy',
+      btnCancelText: AppLanguage.getText('Huy'),
       btnOkOnPress: () {
         AppSP.set(AppSPKey.tenTK, '');
         AppSP.set(AppSPKey.password, '');
@@ -124,7 +126,7 @@ class LoginViewModel extends BaseViewModel {
           MaterialPageRoute(builder: (context) => const SignInView()),
         );
       },
-      btnOkText: 'Có',
+      btnOkText: AppLanguage.getText('Co'),
     ).show();
   }
 
@@ -134,11 +136,11 @@ class LoginViewModel extends BaseViewModel {
       dialogType: DialogType.error,
       animType: AnimType.topSlide,
       showCloseIcon: true,
-      title: 'Đăng nhập thất bại',
+      title: AppLanguage.getText('DangNhapThatBai'),
       desc: desc,
       btnOkColor: AppColor.selectColor,
       btnOkOnPress: () {},
-      btnOkText: 'Thử lại',
+      btnOkText: AppLanguage.getText('ThuLai'),
     ).show();
   }
 }

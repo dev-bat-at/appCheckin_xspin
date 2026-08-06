@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/app/app_sp.dart';
 import 'package:checkin/app/app_sp_key.dart';
 import 'package:checkin/base/base_page.dart';
@@ -64,7 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
             : widget.indexViewModel.usersViewModel.count?.countData;
 
         return BasePage(
-          title: 'Thông Tin',
+          title: AppLanguage.getText('ThongTin'),
           showLogout: true,
           showLogo: true,
           body: RefreshIndicator(
@@ -77,7 +78,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       const SizedBox(height: 15),
                       Text(
-                        "Số lượt đã checkin",
+                        AppLanguage.getText('SoLuotDaCheckin'),
                         style: TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: AppFontSize.sizeLarge),
@@ -118,7 +119,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Mã khách hàng',
+                              AppLanguage.getText('MaKhachHang'),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: AppFontSize.sizeSmall,
@@ -139,7 +140,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ''))),
                             SizedBox(height: 10),
                             Text(
-                              'Mã sự kiện',
+                              AppLanguage.getText('MaSuKien'),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: AppFontSize.sizeSmall,
@@ -159,7 +160,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         Text('${AppSP.get(AppSPKey.tenTK)}'))),
                             SizedBox(height: 10),
                             Text(
-                              'Tên sự kiện',
+                              AppLanguage.getText('TenSuKien'),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: AppFontSize.sizeSmall,
@@ -191,7 +192,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 .isNotEmpty) ...[
                               SizedBox(height: 10),
                               Text(
-                                'Line check-in',
+                                AppLanguage.getText('LineCheckin'),
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: AppFontSize.sizeSmall,
@@ -217,7 +218,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ],
                             SizedBox(height: 10),
                             Text(
-                              'Thời gian checkin',
+                              AppLanguage.getText('ThoiGianCheckin'),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: AppFontSize.sizeSmall,
@@ -245,7 +246,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              'Địa điểm',
+                              AppLanguage.getText('DiaDiem'),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: AppFontSize.sizeSmall,

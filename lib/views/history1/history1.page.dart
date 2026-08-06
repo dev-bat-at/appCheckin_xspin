@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/base/base_page.dart';
 import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/constants/app_fontsize.dart';
@@ -128,7 +129,7 @@ class _HistoryPage1State extends State<HistoryPage1>
                       backgroundColor: AppColor.unSelectColor.withOpacity(0.5),
                     )
                   : null,
-              title: 'Mã Tham Dự',
+              title: AppLanguage.getText('NguoiThamDu'),
               body: RefreshIndicator(
                 onRefresh: _refreshData,
                 color: AppColor.primaryColor,
@@ -154,7 +155,7 @@ class _HistoryPage1State extends State<HistoryPage1>
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    'Tất cả',
+                                    AppLanguage.getText('TatCa'),
                                     style: TextStyle(fontSize: 13),
                                     textAlign: TextAlign.center,
                                   ),
@@ -180,7 +181,7 @@ class _HistoryPage1State extends State<HistoryPage1>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  'Đã checkin',
+                                  AppLanguage.getText('DaCheckin'),
                                   style: TextStyle(
                                       fontSize: 13,
                                       color: _tabController.index == 1

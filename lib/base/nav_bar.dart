@@ -1,5 +1,4 @@
-import 'package:checkin/app/app_sp.dart';
-import 'package:checkin/app/app_sp_key.dart';
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/constants/app_fontsize.dart';
 import 'package:flutter/material.dart';
 import 'package:checkin/constants/app_color.dart';
@@ -62,9 +61,7 @@ class _HomeNavigationBarState extends State<HomeNavigationBar> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.person, size: sideIconSize),
-            label: AppSP.get(AppSPKey.loaiCheckin) == 'NL'
-                ? 'Người tham dự'
-                : 'Người tham dự',
+            label: AppLanguage.getText('NguoiThamDu'),
           ),
           BottomNavigationBarItem(
             icon: Container(
@@ -85,7 +82,7 @@ class _HomeNavigationBarState extends State<HomeNavigationBar> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.menu_rounded, size: sideIconSize),
-            label: 'Danh mục',
+            label: AppLanguage.getText('DanhMuc'),
           ),
         ],
       ),

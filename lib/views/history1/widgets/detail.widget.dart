@@ -1,3 +1,4 @@
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/base/base_page.dart';
 import 'package:checkin/constants/api.dart';
 import 'package:checkin/constants/app_color.dart';
@@ -29,7 +30,8 @@ class _DetailTicket1State extends State<DetailTicket1> {
       },
       builder: (context, loginViewModel, child) {
         return BasePage(
-          title: 'Mã QR: ${widget.user.maQR}',
+          title:
+              '${AppLanguage.getText('MaQR')}: ${widget.user.maQR}',
           body: loginViewModel.isBusy
               ? Center(
                   child: LoadingAnimationWidget.threeRotatingDots(
@@ -75,7 +77,7 @@ class _DetailTicket1State extends State<DetailTicket1> {
 
                         // Thời gian Checkin
                         Text(
-                          'Thời gian checkin',
+                          AppLanguage.getText('ThoiGianCheckin'),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: AppFontSize.sizeSmall,
@@ -90,7 +92,7 @@ class _DetailTicket1State extends State<DetailTicket1> {
                                     fontSize: AppFontSize.sizeSmall),
                               )
                             : Text(
-                                'QR chưa checkin',
+                                AppLanguage.getText('ChuaCheckin'),
                                 style: TextStyle(
                                     fontSize: AppFontSize.sizeSmall,
                                     color: AppColor.selectColor,
@@ -98,7 +100,7 @@ class _DetailTicket1State extends State<DetailTicket1> {
                               ),
                         Divider(height: 32, thickness: 1),
                         Text(
-                          'Trạng thái',
+                          AppLanguage.getText('TrangThai'),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: AppFontSize.sizeSmall,
@@ -107,8 +109,8 @@ class _DetailTicket1State extends State<DetailTicket1> {
                         SizedBox(height: 8),
                         Text(
                           widget.user.tinhTrang == Api.DaCheckin
-                              ? "Đã checkin"
-                              : "Chưa checkin",
+                              ? AppLanguage.getText('DaCheckin')
+                              : AppLanguage.getText('ChuaCheckin'),
                           style: TextStyle(
                             color: widget.user.tinhTrang == Api.DaCheckin
                                 ? AppColor.successQRCode

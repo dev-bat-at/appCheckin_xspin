@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:checkin/constants/app_color.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class BasePage extends StatefulWidget {
   final bool showLogo;
@@ -53,7 +52,8 @@ class _BasePageState extends State<BasePage> {
                 children: [
                   Text(
                     widget.title ?? '',
-                    style: GoogleFonts.aBeeZee(
+                    style: TextStyle(
+                        fontFamily: 'Inter',
                         color: AppColor.extraColor,
                         fontWeight: FontWeight.bold),
                   ),

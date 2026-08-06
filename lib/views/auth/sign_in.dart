@@ -90,7 +90,7 @@ class _SignInViewState extends State<SignInView> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                'Đăng Nhập Hệ Thống',
+                                'System Login',
                                 style: TextStyle(
                                   fontSize: AppFontSize.sizeLarge,
                                   fontWeight: FontWeight.bold,
@@ -100,7 +100,7 @@ class _SignInViewState extends State<SignInView> {
                               GestureDetector(
                                 onTap: launchURL,
                                 child: Text(
-                                  'Điều khoản sử dụng',
+                                  'Terms of Use',
                                   style: TextStyle(
                                     fontSize: AppFontSize.sizeSuperSmall,
                                     color: Colors.blue,
@@ -115,7 +115,8 @@ class _SignInViewState extends State<SignInView> {
                                 padding: const EdgeInsets.all(2.0),
                                 child: Image.asset(
                                   'assets/logo_qr.jpg',
-                                  width: MediaQuery.of(context).size.width * 0.095,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.095,
                                 ),
                               )
                             ],
@@ -127,7 +128,7 @@ class _SignInViewState extends State<SignInView> {
                       TextField(
                         controller: viewModel.username,
                         decoration: InputDecoration(
-                          hintText: 'Mã sự kiện',
+                          hintText: 'Event Code',
                           filled: true,
                           fillColor: AppColor.extraColor,
                           suffixIcon: Padding(
@@ -152,12 +153,17 @@ class _SignInViewState extends State<SignInView> {
                         controller: viewModel.password,
                         obscureText: viewModel.obscureText,
                         decoration: InputDecoration(
-                          hintText: 'Mật khẩu',
+                          hintText: 'Password',
                           filled: true,
                           fillColor: AppColor.extraColor,
-                          suffixIcon: Icon(
-                            Icons.lock,
-                            color: AppColor.primaryColor,
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              viewModel.obscureText
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: AppColor.primaryColor,
+                            ),
+                            onPressed: viewModel.showhidePassword,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -183,7 +189,7 @@ class _SignInViewState extends State<SignInView> {
                                       viewModel.username.text,
                                       viewModel.password.text);
                             },
-                            nameButton: 'Đăng nhập',
+                            nameButton: 'Login',
                             color: AppColor.primaryColor,
                             colorName: AppColor.extraColor),
                       ),
@@ -192,9 +198,10 @@ class _SignInViewState extends State<SignInView> {
                       Align(
                         alignment: Alignment.center,
                         child: Padding(
-                          padding: const EdgeInsets.only(top: 20.0, right: 10.0),
+                          padding:
+                              const EdgeInsets.only(top: 20.0, right: 10.0),
                           child: Text(
-                            'Phiên bản $_appVersion',
+                            'Version $_appVersion',
                             style: TextStyle(
                               fontSize: AppFontSize.sizeSuperSmall,
                               color: Colors.black,

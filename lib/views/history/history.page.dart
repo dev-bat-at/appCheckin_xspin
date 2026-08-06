@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/constants/app_fontsize.dart';
 import 'package:checkin/model/user.model.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -10,7 +11,6 @@ import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/viewmodel/index.vm.dart';
 import 'package:checkin/viewmodel/history_users.vm.dart';
 import 'package:checkin/views/history/widgets/list.widget.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:stacked/stacked.dart';
 
@@ -138,7 +138,7 @@ class _HistoryPageState extends State<HistoryPage>
                       backgroundColor: AppColor.unSelectColor.withOpacity(0.5),
                     )
                   : null,
-              title: 'Người Tham Dự',
+              title: AppLanguage.getText('NguoiThamDu'),
               body: RefreshIndicator(
                 onRefresh: _refreshData,
                 color: AppColor.primaryColor,
@@ -169,9 +169,12 @@ class _HistoryPageState extends State<HistoryPage>
                                     topLeft: Radius.circular(20),
                                     topRight: Radius.circular(20))),
                             children: [
-                              _buildCell('Tổng lượt', AppColor.extraColor),
-                              _buildCell('Đã checkin', AppColor.extraColor),
-                              _buildCell('Chưa checkin', AppColor.extraColor),
+                              _buildCell(AppLanguage.getText('TongLuot'),
+                                  AppColor.extraColor),
+                              _buildCell(AppLanguage.getText('DaCheckin'),
+                                  AppColor.extraColor),
+                              _buildCell(AppLanguage.getText('ChuaCheckin'),
+                                  AppColor.extraColor),
                             ],
                           ),
                           TableRow(
@@ -184,7 +187,8 @@ class _HistoryPageState extends State<HistoryPage>
                                       )
                                     : Text(
                                         '${widget.usersViewModel.count?.countData ?? 0}',
-                                        style: GoogleFonts.aBeeZee(
+                                        style: TextStyle(
+                                          fontFamily: 'Inter',
                                           fontSize: AppFontSize.sizeTable,
                                           color: AppColor.oriColor,
                                           fontWeight: FontWeight.w900,
@@ -199,7 +203,8 @@ class _HistoryPageState extends State<HistoryPage>
                                       )
                                     : Text(
                                         '${widget.usersViewModel.countCheckin?.countData ?? 0}',
-                                        style: GoogleFonts.aBeeZee(
+                                        style: TextStyle(
+                                          fontFamily: 'Inter',
                                           fontSize: AppFontSize.sizeTable,
                                           color: AppColor.successQRCode,
                                           fontWeight: FontWeight.w900,
@@ -216,7 +221,8 @@ class _HistoryPageState extends State<HistoryPage>
                                         )
                                       : Text(
                                           '${(widget.usersViewModel.count?.countData ?? 0) - (widget.usersViewModel.countCheckin?.countData ?? 0)}',
-                                          style: GoogleFonts.aBeeZee(
+                                          style: TextStyle(
+                                            fontFamily: 'Inter',
                                             fontSize: AppFontSize.sizeTable,
                                             color: AppColor.primaryColor,
                                             fontWeight: FontWeight.w900,
@@ -243,7 +249,7 @@ class _HistoryPageState extends State<HistoryPage>
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Text(
-                                  'Người tham dự',
+                                  AppLanguage.getText('NguoiThamDu'),
                                   style: TextStyle(fontSize: 13),
                                   textAlign: TextAlign.center,
                                 ),
@@ -273,7 +279,7 @@ class _HistoryPageState extends State<HistoryPage>
                         )),
                         Tab(
                           child: Text(
-                            'Lịch sử checkin',
+                            AppLanguage.getText('LichSuCheckin'),
                             style: TextStyle(fontSize: 13),
                             textAlign: TextAlign.center,
                             overflow: TextOverflow.ellipsis,
@@ -299,7 +305,7 @@ class _HistoryPageState extends State<HistoryPage>
                                 child: TextField(
                                   controller: _searchController,
                                   decoration: InputDecoration(
-                                      hintText: 'Tìm kiếm',
+                                      hintText: AppLanguage.getText('TimKiem'),
                                       contentPadding:
                                           const EdgeInsets.symmetric(
                                         vertical: 5.0,
@@ -338,6 +344,7 @@ class _HistoryPageState extends State<HistoryPage>
                                 height: 40,
                                 // width: MediaQuery.of(context).size.width * 0.55,
                                 child: DropdownButtonFormField2<String>(
+                                  isExpanded: true,
                                   alignment: Alignment.centerLeft,
                                   isDense: true,
                                   // iconStyleData: IconStyleData(iconSize: 15),
@@ -360,7 +367,7 @@ class _HistoryPageState extends State<HistoryPage>
                                     DropdownMenuItem<String>(
                                       value: 'all',
                                       child: Text(
-                                        'Tất cả',
+                                        AppLanguage.getText('TatCa'),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
@@ -373,17 +380,15 @@ class _HistoryPageState extends State<HistoryPage>
                                     ...viewModel.userStatus.map((status) {
                                       return DropdownMenuItem<String>(
                                         value: status.idStatus,
-                                        child: Wrap(children: [
-                                          Text(
-                                            status.nameStatus!,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: AppColor.darkColor,
-                                            ),
+                                        child: Text(
+                                          status.nameStatus!,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: AppColor.darkColor,
                                           ),
-                                        ]),
+                                        ),
                                       );
                                     }).toList(),
                                   ],
@@ -429,7 +434,7 @@ class _HistoryPageState extends State<HistoryPage>
                           child: TextField(
                             controller: _searchController,
                             decoration: InputDecoration(
-                                hintText: 'Tìm kiếm',
+                                hintText: AppLanguage.getText('TimKiem'),
                                 contentPadding: const EdgeInsets.symmetric(
                                   vertical: 5.0,
                                   horizontal: 10.0,
@@ -513,7 +518,7 @@ class _HistoryPageState extends State<HistoryPage>
                                     .loadMoreUsers(tabKey);
                               },
                               child: Text(
-                                "Xem thêm",
+                                AppLanguage.getText('XemThem'),
                                 style: TextStyle(
                                     color: AppColor.extraColor,
                                     fontSize: AppFontSize.sizeSuperSmall),
@@ -533,7 +538,8 @@ Widget _buildCell(String text, Color color) {
     child: Text(
       text,
       textAlign: TextAlign.center,
-      style: GoogleFonts.aBeeZee(
+      style: TextStyle(
+          fontFamily: 'Inter',
           fontSize: AppFontSize.sizeSmall,
           fontWeight: FontWeight.bold,
           color: color),

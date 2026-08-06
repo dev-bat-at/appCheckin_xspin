@@ -1,3 +1,4 @@
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/app/app_sp.dart';
 import 'package:checkin/app/app_sp_key.dart';
 import 'package:checkin/base/base_page.dart';
@@ -75,10 +76,10 @@ class _MenuPageState extends State<MenuPage> {
                 ),
               ),
               const SizedBox(height: 18),
-              const Text(
-                'Nâng cấp gói chuyên nghiệp',
+              Text(
+                AppLanguage.getText('NangCapGoiChuyenNghiep'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFF7A1621),
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
@@ -86,7 +87,7 @@ class _MenuPageState extends State<MenuPage> {
               ),
               const SizedBox(height: 10),
               Text(
-                'Nâng cấp lên gói chuyên nghiệp để sử dụng tính năng check-in tự động!',
+                AppLanguage.getText('ThongBaoNangCapGoi'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.grey[700],
@@ -108,9 +109,9 @@ class _MenuPageState extends State<MenuPage> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
-                    'Đã hiểu',
-                    style: TextStyle(
+                  child: Text(
+                    AppLanguage.getText('DaHieu'),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: 15,
                     ),
@@ -136,7 +137,7 @@ class _MenuPageState extends State<MenuPage> {
         const deepRose = Color(0xFF7A1621);
 
         return BasePage(
-          title: 'Danh Mục',
+          title: AppLanguage.getText('DanhMuc'),
           showLogo: true,
           body: Container(
             decoration: const BoxDecoration(
@@ -192,9 +193,9 @@ class _MenuPageState extends State<MenuPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Trung tâm điều hướng',
-                                  style: TextStyle(
+                                Text(
+                                  AppLanguage.getText('TrungTamDieuHuong'),
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w800,
                                     fontSize: 18,
@@ -229,7 +230,7 @@ class _MenuPageState extends State<MenuPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Line hiện tại',
+                                      AppLanguage.getText('LineHienTai'),
                                       style: TextStyle(
                                         color:
                                             Colors.white.withValues(alpha: 0.7),
@@ -256,7 +257,7 @@ class _MenuPageState extends State<MenuPage> {
                                     backgroundColor:
                                         Colors.white.withValues(alpha: 0.12),
                                   ),
-                                  child: const Text('Đổi line'),
+                                  child: Text(AppLanguage.getText('DoiLine')),
                                 ),
                             ],
                           ),
@@ -269,7 +270,7 @@ class _MenuPageState extends State<MenuPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Text(
-                    'Tác vụ chính',
+                    AppLanguage.getText('TacVuChinh'),
                     style: TextStyle(
                       color: deepRose,
                       fontWeight: FontWeight.w800,
@@ -280,7 +281,7 @@ class _MenuPageState extends State<MenuPage> {
                 const SizedBox(height: 12),
                 _MenuCard(
                   icon: Icons.info_outline,
-                  title: 'Thông tin sự kiện',
+                  title: AppLanguage.getText('ThongTinSuKien'),
                   accentColor: AppColor.primaryColor,
                   backgroundColor: Colors.white,
                   onTap: () {
@@ -297,7 +298,7 @@ class _MenuPageState extends State<MenuPage> {
                 ),
                 _MenuCard(
                   icon: Icons.query_stats,
-                  title: 'Thống kê',
+                  title: AppLanguage.getText('ThongKe'),
                   accentColor: const Color(0xFFE58A2C),
                   backgroundColor: const Color(0xFFFFF8EF),
                   onTap: () {
@@ -311,7 +312,7 @@ class _MenuPageState extends State<MenuPage> {
                 ),
                 _MenuCard(
                   icon: Icons.qr_code_scanner_outlined,
-                  title: 'Check-in tự động',
+                  title: AppLanguage.getText('CheckinTuDong'),
                   accentColor: const Color(0xFF127A67),
                   backgroundColor: const Color(0xFFF1FBF8),
                   onTap: () async {
@@ -333,22 +334,10 @@ class _MenuPageState extends State<MenuPage> {
                     );
                   },
                 ),
-                // if (canChangeLine)
-                //   _MenuCard(
-                //     icon: Icons.sync_alt_rounded,
-                //     title: 'Đổi line check-in',
-                //     subtitle: currentLine.isEmpty
-                //         ? 'Chọn line hoạt động hiện tại'
-                //         : 'Đang dùng $currentLine',
-                //     accentColor: deepRose,
-                //     backgroundColor: softRose,
-                //     onTap: _openLineSelection,
-                //   ),
-                // const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Text(
-                    'Tài khoản',
+                    AppLanguage.getText('TaiKhoan'),
                     style: TextStyle(
                       color: Colors.grey[800],
                       fontWeight: FontWeight.w800,
@@ -359,7 +348,7 @@ class _MenuPageState extends State<MenuPage> {
                 const SizedBox(height: 12),
                 _MenuCard(
                   icon: Icons.logout,
-                  title: 'Đăng xuất',
+                  title: AppLanguage.getText('DangXuat'),
                   accentColor: Colors.redAccent,
                   backgroundColor: const Color(0xFFFFF3F2),
                   onTap: () => widget.loginViewModel.showLogOut(context),

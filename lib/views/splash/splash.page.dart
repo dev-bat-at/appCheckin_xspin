@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/app/app_sp.dart';
 import 'package:checkin/app/app_sp_key.dart';
 import 'package:checkin/constants/app_color.dart';
@@ -28,6 +29,7 @@ class _SplashPageState extends State<SplashPage> {
         AppSP.get(AppSPKey.tenTK) != '' &&
         AppSP.get(AppSPKey.password) != '' &&
         AppSP.get(AppSPKey.idSuKien) != '') {
+      await AppLanguage.fetchLanguages(AppSP.get(AppSPKey.idSuKien).toString());
       await Future.delayed(const Duration(seconds: 2), () {
         // Tải ảnh trong 3 giây
         //precacheImage(const AssetImage('assets/imgStart.png'), context);

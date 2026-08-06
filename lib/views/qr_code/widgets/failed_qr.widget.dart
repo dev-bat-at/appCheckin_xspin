@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/constants/app_fontsize.dart';
 import 'package:checkin/viewmodel/qr_code.vm.dart';
@@ -115,7 +116,7 @@ class _FailedQrCodeState extends State<FailedQrCode> {
                   // Continue Button
                   if (widget.autoClose)
                     Text(
-                      'Tự động đóng sau 3 giây....',
+                      AppLanguage.getText('TuDongDongSau3Giay'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: isTablet
@@ -165,7 +166,7 @@ class _FailedQrCodeState extends State<FailedQrCode> {
                               0), // Elevation handled by boxShadow
                         ),
                         child: Text(
-                          "TIẾP TỤC CHECK IN",
+                          AppLanguage.getText('TiepTucCheckIn'),
                           style: TextStyle(
                             fontSize: isTablet
                                 ? (AppFontSize.sizeMedium ?? 20) + 1

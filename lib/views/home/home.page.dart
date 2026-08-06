@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:checkin/app/app_language.dart';
 import 'package:flutter/material.dart';
 import 'package:checkin/base/base_page.dart';
 import 'package:checkin/constants/app_color.dart';
@@ -15,7 +15,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      title: 'Trang chủ',
+      title: AppLanguage.getText('TrangChu'),
       body: Center(
         child: LoadingAnimationWidget.threeRotatingDots(
           color: AppColor.primaryColor,
