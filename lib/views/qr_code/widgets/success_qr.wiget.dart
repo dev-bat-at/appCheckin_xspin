@@ -82,7 +82,7 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
             .timeout(
               Duration(seconds: 30),
               onTimeout: () =>
-                  throw TimeoutException('Sự cố internet. Vui lòng thử lại.'),
+                  throw TimeoutException(AppLanguage.getText('SuCoInternet')),
             );
         if (mounted) {
           Navigator.maybePop(context);
@@ -93,26 +93,26 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
             .timeout(
               Duration(seconds: 30),
               onTimeout: () =>
-                  throw TimeoutException('Sự cố internet. Vui lòng thử lại.'),
+                  throw TimeoutException(AppLanguage.getText('SuCoInternet')),
             );
         await widget.qrCodeViewModel.indexViewModel.historyViewModel
             .reloadUsers()
             .timeout(
               Duration(seconds: 30),
               onTimeout: () =>
-                  throw TimeoutException('Sự cố internet. Vui lòng thử lại.'),
+                  throw TimeoutException(AppLanguage.getText('SuCoInternet')),
             );
 
         if (mounted) {
           Navigator.maybePop(context);
         }
       } else {
-        throw Exception('Không thể tải dữ liệu người dùng.');
+        throw Exception(AppLanguage.getText('KhongTheTaiDuLieuNguoiDung'));
       }
       await timeout; // Chờ thời gian kết thúc
     } catch (e) {
       if (mounted) {
-        _showSnackBar('Có lỗi xảy ra: $e'); // Hiển thị SnackBar khi có lỗi
+        _showSnackBar('${AppLanguage.getText('CoLoiXayRa')}: $e'); // Hiển thị SnackBar khi có lỗi
       }
     } finally {
       if (mounted) {
@@ -152,7 +152,7 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
             .timeout(
               Duration(seconds: 30),
               onTimeout: () =>
-                  throw TimeoutException('Sự cố internet. Vui lòng thử lại.'),
+                  throw TimeoutException(AppLanguage.getText('SuCoInternet')),
             );
 
         if (mounted) {
@@ -168,14 +168,14 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
             .timeout(
               Duration(seconds: 30),
               onTimeout: () =>
-                  throw TimeoutException('Sự cố internet. Vui lòng thử lại.'),
+                  throw TimeoutException(AppLanguage.getText('SuCoInternet')),
             );
         await widget.qrCodeViewModel.indexViewModel.historyViewModel
             .getCountUserCheckIn()
             .timeout(
               Duration(seconds: 30),
               onTimeout: () =>
-                  throw TimeoutException('Sự cố internet. Vui lòng thử lại.'),
+                  throw TimeoutException(AppLanguage.getText('SuCoInternet')),
             );
 
         if (mounted) {
@@ -189,7 +189,7 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
       await timeout; // Chờ thời gian kết thúc
     } catch (e) {
       if (mounted) {
-        _showSnackBar('Có lỗi xảy ra: $e'); // Hiển thị SnackBar khi có lỗi
+        _showSnackBar('${AppLanguage.getText('CoLoiXayRa')}: $e'); // Hiển thị SnackBar khi có lỗi
       }
     } finally {
       if (mounted) {
@@ -266,7 +266,7 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
                                         padding:
                                             const EdgeInsets.only(bottom: 10),
                                         child: Text(
-                                          "Check-in thành công!",
+                                          AppLanguage.getText('CheckInThanhCong'),
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: titleFontSize,
@@ -380,7 +380,7 @@ class _SuccessScreenQRState extends State<SuccessScreenQR> {
                           const SizedBox(height: 30),
                           if (widget.autoClose)
                             Text(
-                              'Tự động đóng sau 3 giây....',
+                              AppLanguage.getText('TuDongDongSau3Giay'),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: isTablet

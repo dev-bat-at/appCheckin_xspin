@@ -3,6 +3,7 @@ import 'package:checkin/services/api_services.dart';
 
 class AppLanguage {
   static final Map<String, String> _apiLanguages = {};
+  static final Map<String, String> _normalizedApiLanguages = {};
 
   static const Map<String, String> _defaultLanguages = {
     // Navigation & Headers
@@ -95,16 +96,27 @@ class AppLanguage {
     'LoiKetNoiInternet':
         'Lỗi kết nối internet. Vui lòng kiểm tra Wi-Fi hoặc dữ liệu di động.',
     'SuCoInternet': 'Sự cố internet. Vui lòng thử lại.',
+    'CheckInThanhCong': 'Check-in thành công!',
+    'CoLoiXayRa': 'Có lỗi xảy ra',
+    'KhongTheTaiDuLieuNguoiDung': 'Không thể tải dữ liệu người dùng.',
     'VuiLongThuLaiVoiMaQRKhac': 'Vui lòng thử lại với mã QR khác.',
+  };
+
+  static final Map<String, String> _normalizedDefaultLanguages = {
+    for (var entry in _defaultLanguages.entries)
+      entry.key.toLowerCase(): entry.value
   };
 
   /// Set languages directly from API list
   static void setLanguages(List<dynamic> list) {
     _apiLanguages.clear();
+    _normalizedApiLanguages.clear();
     for (var item in list) {
       if (item is Map && item['MaNgonNgu'] != null && item['NgonNgu'] != null) {
-        _apiLanguages[item['MaNgonNgu'].toString()] =
-            item['NgonNgu'].toString();
+        final key = item['MaNgonNgu'].toString();
+        final value = item['NgonNgu'].toString();
+        _apiLanguages[key] = value;
+        _normalizedApiLanguages[key.toLowerCase()] = value;
       }
     }
   }
@@ -129,14 +141,27 @@ class AppLanguage {
     }
   }
 
-  /// Get translated text by key with fallback to default languages map
+  /// Get translated text by key with fallback to default languages map (case-insensitive)
   static String getText(String key, {String? fallback}) {
+    // 1. Exact match in API response
     if (_apiLanguages.containsKey(key) && _apiLanguages[key]!.isNotEmpty) {
       return _apiLanguages[key]!;
     }
+    // 2. Case-insensitive match in API response
+    final lowerKey = key.toLowerCase();
+    if (_normalizedApiLanguages.containsKey(lowerKey) &&
+        _normalizedApiLanguages[lowerKey]!.isNotEmpty) {
+      return _normalizedApiLanguages[lowerKey]!;
+    }
+    // 3. Exact match in default languages
     if (_defaultLanguages.containsKey(key)) {
       return _defaultLanguages[key]!;
     }
+    // 4. Case-insensitive match in default languages
+    if (_normalizedDefaultLanguages.containsKey(lowerKey)) {
+      return _normalizedDefaultLanguages[lowerKey]!;
+    }
+    // 5. Fallback if provided
     if (fallback != null && fallback.isNotEmpty) {
       return fallback;
     }

@@ -129,13 +129,13 @@ class _AutoCheckinPageState extends State<AutoCheckinPage>
 
   CameraFacing _resolveCameraFacing(String? cameraSetting) {
     switch (cameraSetting?.trim()) {
-      // case 'CameraSau':
-      //   return CameraFacing.back;
-      // case 'CameraTruoc':
-      // default:
-      //   return CameraFacing.front;
+      case 'CameraSau':
+        return CameraFacing.back;
+      case 'CameraTruoc':
       default:
         return CameraFacing.front;
+      // default:
+      //   return CameraFacing.front;
     }
   }
 
