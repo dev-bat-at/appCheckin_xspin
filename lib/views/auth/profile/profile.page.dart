@@ -23,6 +23,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   Future<void> _refreshData() async {
+    await AppLanguage.refreshLanguages();
     await widget.loginViewModel.loadUser();
     await _loadCounters();
   }

@@ -100,6 +100,7 @@ class _HistoryPageState extends State<HistoryPage>
   }
 
   Future<void> _refreshData() async {
+    await AppLanguage.refreshLanguages();
     setState(() {});
     await widget.usersViewModel.reloadUsers();
   }
@@ -381,7 +382,10 @@ class _HistoryPageState extends State<HistoryPage>
                                       return DropdownMenuItem<String>(
                                         value: status.idStatus,
                                         child: Text(
-                                          status.nameStatus!,
+                                          AppLanguage.getText(
+                                            status.idStatus ?? '',
+                                            fallback: status.nameStatus,
+                                          ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(

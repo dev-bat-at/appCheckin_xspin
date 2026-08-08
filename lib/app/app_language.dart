@@ -1,3 +1,5 @@
+import 'package:checkin/app/app_sp.dart';
+import 'package:checkin/app/app_sp_key.dart';
 import 'package:checkin/constants/api.dart';
 import 'package:checkin/services/api_services.dart';
 
@@ -139,6 +141,12 @@ class AppLanguage {
     } catch (e) {
       print('Fetch list ngon ngu error: $e');
     }
+  }
+
+  /// Reload languages using current event id from local storage.
+  static Future<void> refreshLanguages() async {
+    final idSuKien = AppSP.get(AppSPKey.idSuKien)?.toString() ?? '';
+    await fetchLanguages(idSuKien);
   }
 
   /// Get translated text by key with fallback to default languages map (case-insensitive)
