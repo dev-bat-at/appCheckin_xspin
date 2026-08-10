@@ -1,3 +1,4 @@
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/app/app_sp.dart';
 import 'package:checkin/app/app_sp_key.dart';
 import 'package:checkin/viewmodel/history_user_checkin.vm.dart';
@@ -27,7 +28,13 @@ class IndexViewModel extends BaseViewModel {
     loginViewModel = LoginViewModel();
     historyViewModel = HistoryCheckinViewModel();
   }
+  Future<void> refreshAppLanguage() async {
+    await AppLanguage.refreshLanguages();
+    notifyListeners();
+  }
+
   Future<void> _reloadCurrentPage() async {
+    await refreshAppLanguage();
     if (currentIndex == 0) {
       if (AppSP.get(AppSPKey.loaiCheckin) == 'NL') {
         await usersViewModel.reloadUsers();

@@ -2,13 +2,16 @@ import 'package:checkin/app/app_language.dart';
 import 'package:checkin/base/base_page.dart';
 import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/model/statistics.model.dart';
+import 'package:checkin/viewmodel/index.vm.dart';
 import 'package:checkin/viewmodel/statistics.vm.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:stacked/stacked.dart';
 
 class StatisticsPage extends StatefulWidget {
-  const StatisticsPage({super.key});
+  final IndexViewModel? indexViewModel;
+
+  const StatisticsPage({super.key, this.indexViewModel});
 
   @override
   State<StatisticsPage> createState() => _StatisticsPageState();
@@ -61,7 +64,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
               ),
             ),
             child: RefreshIndicator(
-              onRefresh: viewModel.loadStatistics,
+              onRefresh: () async {
+                await widget.indexViewModel?.refreshAppLanguage();
+                await viewModel.loadStatistics();
+              },
               color: AppColor.primaryColor,
               child: viewModel.isBusy
                   ? Center(

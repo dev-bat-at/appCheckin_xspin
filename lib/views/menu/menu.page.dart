@@ -305,7 +305,9 @@ class _MenuPageState extends State<MenuPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const StatisticsPage(),
+                        builder: (context) => StatisticsPage(
+                          indexViewModel: widget.indexViewModel,
+                        ),
                       ),
                     );
                   },

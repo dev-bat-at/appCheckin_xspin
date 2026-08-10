@@ -92,7 +92,7 @@ class _HistoryPage1State extends State<HistoryPage1>
   }
 
   Future<void> _refreshData() async {
-    await AppLanguage.refreshLanguages();
+    await widget.indexViewModel.refreshAppLanguage();
     setState(() {});
     await widget.usersViewModel.reloadUsers();
   }

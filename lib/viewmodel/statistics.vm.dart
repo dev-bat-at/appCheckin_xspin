@@ -1,4 +1,3 @@
-import 'package:checkin/app/app_language.dart';
 import 'package:checkin/app/app_sp.dart';
 import 'package:checkin/app/app_sp_key.dart';
 import 'package:checkin/model/statistics.model.dart';
@@ -19,7 +18,6 @@ class StatisticsViewModel extends BaseViewModel {
   Future<void> loadStatistics() async {
     setBusy(true);
     try {
-      await AppLanguage.refreshLanguages();
       await _syncCheckinConfiguration();
 
       statistics = await _statisticsRequest.getStatistics(
