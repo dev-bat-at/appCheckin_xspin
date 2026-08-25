@@ -31,6 +31,11 @@ class AppLanguage {
     'TongNguoiThamDu': 'Tổng người tham dự',
     'TatCa': 'Tất cả',
     'CheckinTuDong': 'Check-in tự động',
+    'Checkin': 'Check-in',
+    'XacNhanCheckin': 'Xác nhận check-in',
+    'XacNhan': 'Xác nhận',
+    'Dong': 'Đóng',
+    'XemChiTiet': 'Xem chi tiết',
 
     // Checkin details & Tickets
     'LichSuCheckin': 'Lịch sử check-in',

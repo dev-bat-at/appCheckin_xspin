@@ -161,4 +161,25 @@ class Users {
   bool searchQR(String qr) {
     return maQR.toLowerCase().contains(qr.toLowerCase());
   }
+
+  /// True when the attendee has already checked in at least once.
+  bool get hasCheckedIn {
+    if (isCheckin) return true;
+    if (tinhTrang == 'Đã check-in') return true;
+    if (maTinhTrang == 'DaCheckinXong' || maTinhTrang == 'DangCheckin') {
+      return true;
+    }
+    if ((dacheckIn ?? 0) > 0) return true;
+    if (thoiDiemCheckin != null && thoiDiemCheckin!.isNotEmpty) return true;
+    if (ngayCheckin != null && ngayCheckin!.isNotEmpty) return true;
+    return false;
+  }
+
+  /// True when manual check-in is still allowed for this attendee.
+  bool get canManualCheckIn {
+    if (maTinhTrang == 'DaCheckinXong') return false;
+    if (tinhTrang == 'Đã check-in') return false;
+    if (chuaCheckin != null) return chuaCheckin! > 0;
+    return !isCheckin;
+  }
 }

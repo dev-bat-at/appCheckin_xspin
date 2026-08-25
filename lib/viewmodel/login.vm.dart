@@ -53,6 +53,8 @@ class LoginViewModel extends BaseViewModel {
     if (userLogin != null) {
       await AppSP.set(
           AppSPKey.isCheckinTuDong, userLogin!.isCheckinTuDong ?? '');
+      await AppSP.set(
+          AppSPKey.isCheckinThuCong, userLogin!.isCheckinThuCong ?? '');
     }
 
     setBusy(false);
@@ -73,6 +75,8 @@ class LoginViewModel extends BaseViewModel {
         await AppSP.set(AppSPKey.loaiCheckin, data!.loaiCheckin ?? '');
         await AppSP.set(AppSPKey.isNhieuLine, data!.isNhieuLine ?? '');
         await AppSP.set(AppSPKey.isCheckinTuDong, data!.isCheckinTuDong ?? '');
+        await AppSP.set(
+            AppSPKey.isCheckinThuCong, data!.isCheckinThuCong ?? '');
         await AppSP.set(AppSPKey.idLineCheckin, '');
         await AppSP.set(AppSPKey.tenLineCheckin, '');
         await AppLanguage.fetchLanguages(data!.idSuKien);
@@ -117,6 +121,7 @@ class LoginViewModel extends BaseViewModel {
         AppSP.set(AppSPKey.loaiCheckin, '');
         AppSP.set(AppSPKey.isNhieuLine, '');
         AppSP.set(AppSPKey.isCheckinTuDong, '');
+        AppSP.set(AppSPKey.isCheckinThuCong, '');
         AppSP.set(AppSPKey.idLineCheckin, '');
         AppSP.set(AppSPKey.tenLineCheckin, '');
         print('ID: ${AppSP.get(AppSPKey.tenTK)}');

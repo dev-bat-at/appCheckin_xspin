@@ -1,11 +1,11 @@
 import 'package:checkin/app/app_language.dart';
-import 'package:checkin/constants/api.dart';
+import 'package:checkin/app/app_sp.dart';
+import 'package:checkin/app/app_sp_key.dart';
 import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/constants/app_fontsize.dart';
 import 'package:checkin/model/user.model.dart';
 import 'package:checkin/viewmodel/history_user_checkin.vm.dart';
 import 'package:flutter/material.dart';
-import 'package:stacked/stacked.dart';
 
 class ItemTicket extends StatefulWidget {
   final String? qrCodeUrl;
@@ -25,144 +25,137 @@ class ItemTicket extends StatefulWidget {
 }
 
 class _ItemTicketQRState extends State<ItemTicket> {
+  bool get _isManualCheckin =>
+      AppSP.get(AppSPKey.isCheckinThuCong)?.toString() == '1';
+
+  Color get _maQrColor =>
+      widget.user.hasCheckedIn ? AppColor.successQRCode : AppColor.primaryColor;
+
   @override
   Widget build(BuildContext context) {
+    final showManualActions =
+        _isManualCheckin && widget.user.canManualCheckIn;
+
     return InkWell(
-      onTap: widget.onTap,
+      onTap: showManualActions ? null : widget.onTap,
       child: Card(
         elevation: 2,
         color: AppColor.extraColor,
-        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
         child: Container(
-          padding: EdgeInsets.all(16),
-          child: Row(
+          padding: const EdgeInsets.all(16),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                  child: Column(
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 5.0,
-                      horizontal: 15.0,
-                    ),
-                    decoration: BoxDecoration(
-                      color: widget.user.tinhTrang == Api.DaCheckin
-                          ? AppColor.successQRCode
-                          : AppColor.primaryColor,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Text(
-                      widget.user.maQR,
-                      style: TextStyle(
-                        fontWeight: AppFontWeight.bold,
-                        color: AppColor.extraColor,
-                      ),
-                      overflow: TextOverflow
-                          .ellipsis, // Hiển thị dấu ba chấm nếu chữ quá dài
-                    ),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    widget.user.field2!,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontWeight: AppFontWeight.bold,
-                    ),
-                    maxLines: 2,
-                  ),
-                ],
-              )),
-              Expanded(
-                  child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  widget.user.tinhTrang == Api.DaCheckin
-                      ? Text(
-                          AppLanguage.getText('DaCheckin'),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.user.maQR,
                           style: TextStyle(
-                              fontSize: AppFontSize.sizeSuperSmall,
-                              fontWeight: FontWeight.bold,
-                              color: AppColor.successQRCode),
-                        )
-                      : Text(
-                          AppLanguage.getText('ChuaCheckin'),
-                          style: TextStyle(
-                              fontSize: AppFontSize.sizeSuperSmall,
-                              fontWeight: FontWeight.bold,
-                              color: AppColor.selectColor),
+                            fontWeight: AppFontWeight.bold,
+                            color: _maQrColor,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                  Text(
-                    widget.user.ngayCheckin!,
-                    style: TextStyle(
-                        color: AppColor.successQRCode,
-                        fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis,
+                        const SizedBox(height: 5),
+                        Text(
+                          widget.user.field2 ?? '',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontWeight: AppFontWeight.bold,
+                          ),
+                          maxLines: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        widget.user.hasCheckedIn
+                            ? Text(
+                                AppLanguage.getText('DaCheckin'),
+                                style: TextStyle(
+                                  fontSize: AppFontSize.sizeSuperSmall,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColor.successQRCode,
+                                ),
+                              )
+                            : Text(
+                                AppLanguage.getText('ChuaCheckin'),
+                                style: TextStyle(
+                                  fontSize: AppFontSize.sizeSuperSmall,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColor.primaryColor,
+                                ),
+                              ),
+                        Text(
+                          widget.user.ngayCheckin ?? '',
+                          style: TextStyle(
+                            color: AppColor.successQRCode,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      ],
+                    ),
                   )
                 ],
-              ))
+              ),
+              if (showManualActions) ...[
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    OutlinedButton(
+                      onPressed: () {
+                        widget.usersViewModel.viewContext = context;
+                        widget.usersViewModel.nextConfirmCheckin(widget.user);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColor.primaryColor,
+                        side: BorderSide(
+                          color: AppColor.primaryColor,
+                          width: 1.5,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        AppLanguage.getText('Checkin'),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      tooltip: AppLanguage.getText('XemChiTiet'),
+                      onPressed: widget.onTap,
+                      icon: Icon(
+                        Icons.visibility_outlined,
+                        color: AppColor.darkColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),
-        // child: ListTile(
-        //   title: Container(
-        //     padding: const EdgeInsets.symmetric(
-        //       vertical: 5.0,
-        //       horizontal: 15.0,
-        //     ),
-        //     decoration: BoxDecoration(
-        //       color: AppColor.successQRCode,
-        //       borderRadius: BorderRadius.circular(8.0),
-        //     ),
-        //     child: Text(
-        //       widget.user.maQR,
-        //       style: TextStyle(
-        //         fontWeight: AppFontWeight.bold,
-        //         color: AppColor.extraColor,
-        //       ),
-        //       overflow:
-        //           TextOverflow.ellipsis, // Hiển thị dấu ba chấm nếu chữ quá dài
-        //     ),
-        //   ),
-        //   subtitle: Column(
-        //     crossAxisAlignment: CrossAxisAlignment.start,
-        //     children: [
-        //       SizedBox(
-        //         height: 10,
-        //       ),
-        //       widget.user.ngayCheckin != ''
-        //           ? Text(
-        //               widget.user.ngayCheckin!,
-        //               overflow: TextOverflow.ellipsis,
-        //             )
-        //           : Text(
-        //               'Chưa checkin',
-        //               style: TextStyle(color: AppColor.selectColor),
-        //               overflow: TextOverflow.ellipsis,
-        //             ),
-        //       Text(
-        //         widget.user.field2!,
-        //         overflow: TextOverflow.ellipsis,
-        //       ),
-        //     ],
-        //   ),
-        //   trailing: Text(
-        //     widget.user.tinhTrang == Api.DaCheckin
-        //         ? "Đã checkin"
-        //         : "Chưa checkin",
-        //     style: TextStyle(
-        //         fontSize: AppFontSize.sizeSuperSmall,
-        //         color: widget.user.tinhTrang == Api.DaCheckin
-        //             ? AppColor.successQRCode
-        //             : AppColor.selectColor),
-        //     overflow:
-        //         TextOverflow.ellipsis, // Áp dụng tương tự cho phần trạng thái
-        //   ),
-        // ),
       ),
     );
   }

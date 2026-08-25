@@ -1,5 +1,8 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:checkin/app/app_language.dart';
 import 'package:checkin/app/app_sp.dart';
 import 'package:checkin/app/app_sp_key.dart';
+import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/model/checkin.model.dart';
 import 'package:checkin/model/count_users.dart';
 import 'package:checkin/model/quantity.model.dart';
@@ -7,6 +10,7 @@ import 'package:checkin/model/user.model.dart';
 import 'package:checkin/requests/history_user.requets.dart';
 import 'package:checkin/requests/qrcode.request.dart';
 import 'package:checkin/viewmodel/index.vm.dart';
+import 'package:checkin/views/history/widgets/confirm_checkin.widget.dart';
 import 'package:checkin/views/history/widgets/detail.ticket.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
@@ -87,7 +91,7 @@ class UsersViewModel extends BaseViewModel {
         idSuKien: AppSP.get(AppSPKey.idSuKien),
         maTinhTrang: '',
         page: 1,
-        searchQuery: search.text,
+        searchQuery: searchQuery,
       );
       selectedStatus = 'all';
     } catch (e) {
@@ -107,7 +111,7 @@ class UsersViewModel extends BaseViewModel {
         idSuKien: AppSP.get(AppSPKey.idSuKien),
         maTinhTrang: status ?? '',
         page: currentPageAll,
-        searchQuery: search.text,
+        searchQuery: searchQuery,
       );
     } catch (e) {
       print('Error in getUsersByStatus: $e');
@@ -143,7 +147,7 @@ class UsersViewModel extends BaseViewModel {
               idSuKien: AppSP.get(AppSPKey.idSuKien),
               maTinhTrang: status.idStatus!,
               page: currentPageAll,
-              searchQuery: search.text,
+              searchQuery: searchQuery,
             ),
           )
           .toList();
@@ -152,7 +156,7 @@ class UsersViewModel extends BaseViewModel {
         ...statusRequests,
         userRequest.getListUserCheckin(
           idSuKien: AppSP.get(AppSPKey.idSuKien),
-          searchQuery: search.text,
+          searchQuery: searchQuery,
         ),
       ]);
 
@@ -204,7 +208,7 @@ class UsersViewModel extends BaseViewModel {
   }
 
   void onSearchChanged(String query) {
-    search.text = query;
+    updateSearchQuery(query);
     getUsers(); // Gọi lại getUsers với query mới
   }
 
@@ -238,7 +242,7 @@ class UsersViewModel extends BaseViewModel {
             idSuKien: AppSP.get(AppSPKey.idSuKien),
             maTinhTrang: status.idStatus!,
             page: currentPageAll,
-            searchQuery: search.text,
+            searchQuery: searchQuery,
           );
 
           if (moreUsers.isNotEmpty) {
@@ -347,7 +351,10 @@ class UsersViewModel extends BaseViewModel {
   }
 
   void updateSearchQuery(String query) {
-    search.text = query;
+    searchQuery = query;
+    if (search.text != query) {
+      search.text = query;
+    }
     notifyListeners();
   }
 
@@ -386,5 +393,53 @@ class UsersViewModel extends BaseViewModel {
         },
       ),
     );
+  }
+
+  Future<void> nextConfirmCheckin(Users user) async {
+    await Navigator.push(
+      viewContext,
+      MaterialPageRoute(
+        builder: (context) => ConfirmCheckinPage(
+          user: user,
+          onConfirm: manualCheckIn,
+          onBackToList: reloadUsers,
+        ),
+      ),
+    );
+  }
+
+  Future<bool> manualCheckIn(Users user) async {
+    try {
+      final result = await qrCodeRequest.checkIn(
+        idSuKien: AppSP.get(AppSPKey.idSuKien),
+        maQR: user.maQR,
+        idLineCheckin: AppSP.get(AppSPKey.idLineCheckin),
+      );
+
+      if (result.status == 1) {
+        return true;
+      }
+
+      _showCheckInFailedDialog(
+        result.message ?? AppLanguage.getText('CheckinThatBaiLienHeAdmin'),
+      );
+      return false;
+    } catch (e) {
+      _showCheckInFailedDialog(AppLanguage.getText('LoiKetNoiInternet'));
+      return false;
+    }
+  }
+
+  void _showCheckInFailedDialog(String message) {
+    AwesomeDialog(
+      context: viewContext,
+      dialogType: DialogType.error,
+      animType: AnimType.topSlide,
+      title: AppLanguage.getText('ThongBao'),
+      desc: message,
+      btnOkColor: AppColor.selectColor,
+      btnOkOnPress: () {},
+      btnOkText: AppLanguage.getText('DaHieu'),
+    ).show();
   }
 }

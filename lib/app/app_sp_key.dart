@@ -9,6 +9,7 @@ class AppSPKey {
   static const String loaiCheckin = 'loaiCheckin';
   static const String isNhieuLine = 'isNhieuLine';
   static const String isCheckinTuDong = 'isCheckinTuDong';
+  static const String isCheckinThuCong = 'isCheckinThuCong';
   static const String idLineCheckin = 'idLineCheckin';
   static const String tenLineCheckin = 'tenLineCheckin';
 }

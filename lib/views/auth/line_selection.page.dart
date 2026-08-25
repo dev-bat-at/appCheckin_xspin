@@ -103,6 +103,7 @@ class _LineSelectionPageState extends State<LineSelectionPage> {
     await AppSP.set(AppSPKey.loaiCheckin, '');
     await AppSP.set(AppSPKey.isNhieuLine, '');
     await AppSP.set(AppSPKey.isCheckinTuDong, '');
+    await AppSP.set(AppSPKey.isCheckinThuCong, '');
     await AppSP.set(AppSPKey.idLineCheckin, '');
     await AppSP.set(AppSPKey.tenLineCheckin, '');
 

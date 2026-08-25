@@ -35,7 +35,8 @@ class _HistoryPage1State extends State<HistoryPage1>
   @override
   void initState() {
     super.initState();
-    _searchController = TextEditingController();
+    _searchController =
+        TextEditingController(text: widget.usersViewModel.searchQuery);
     _tabController = TabController(length: 3, vsync: this);
     _scrollController = ScrollController();
 
