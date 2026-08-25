@@ -46,20 +46,53 @@ class LoginViewModel extends BaseViewModel {
     notifyListeners();
   }
 
+  /// Gọi lại API DangNhap và cập nhật toàn bộ config (LoaiCheckin, isCheckinThuCong, ...).
   Future<Login?> loadUser() async {
+    final tenTK = AppSP.get(AppSPKey.tenTK)?.toString() ?? '';
+    final password = AppSP.get(AppSPKey.password)?.toString() ?? '';
+    if (tenTK.isEmpty || password.isEmpty) {
+      return null;
+    }
+
     setBusy(true);
-    userLogin = await loginRequest.getUsers(
-        tenSK: AppSP.get(AppSPKey.tenTK), mkSK: AppSP.get(AppSPKey.password));
-    if (userLogin != null) {
+    try {
+      final currentLoaiCheckin =
+          AppSP.get(AppSPKey.loaiCheckin)?.toString() ?? '';
+      final currentIsNhieuLine =
+          AppSP.get(AppSPKey.isNhieuLine)?.toString() ?? '';
+      final currentIdSuKien = AppSP.get(AppSPKey.idSuKien)?.toString() ?? '';
+
+      userLogin = await loginRequest.getUsers(tenSK: tenTK, mkSK: password);
+      if (userLogin == null) {
+        return null;
+      }
+
+      final nextLoaiCheckin = userLogin!.loaiCheckin ?? '';
+      final nextIsNhieuLine = userLogin!.isNhieuLine ?? '';
+      final nextIdSuKien = userLogin!.idSuKien;
+
+      final hasCheckinModeChanged = currentLoaiCheckin != nextLoaiCheckin ||
+          currentIsNhieuLine != nextIsNhieuLine ||
+          currentIdSuKien != nextIdSuKien;
+
+      await AppSP.set(AppSPKey.idSuKien, nextIdSuKien);
+      await AppSP.set(AppSPKey.loaiCheckin, nextLoaiCheckin);
+      await AppSP.set(AppSPKey.isNhieuLine, nextIsNhieuLine);
       await AppSP.set(
           AppSPKey.isCheckinTuDong, userLogin!.isCheckinTuDong ?? '');
       await AppSP.set(
           AppSPKey.isCheckinThuCong, userLogin!.isCheckinThuCong ?? '');
-    }
 
-    setBusy(false);
-    notifyListeners();
-    return userLogin;
+      if (hasCheckinModeChanged) {
+        await AppSP.set(AppSPKey.idLineCheckin, '');
+        await AppSP.set(AppSPKey.tenLineCheckin, '');
+      }
+
+      return userLogin;
+    } finally {
+      setBusy(false);
+      notifyListeners();
+    }
   }
 
   Future<void> showSignInSuccessDialog(

@@ -107,58 +107,47 @@ class _ConfirmCheckinPageState extends State<ConfirmCheckinPage> {
                                       ),
                                     ),
                                     const SizedBox(height: 16),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          '${AppLanguage.getText('MaThamDu')}:',
-                                          style: TextStyle(
-                                            fontSize: qrFontSize,
-                                            fontWeight: FontWeight.w900,
-                                            color: AppColor.successQRCode,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Flexible(
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 5,
-                                              horizontal: 10,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: AppColor.successQRCode,
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
+                                    LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        final codeFontSize = isTablet
+                                            ? qrFontSize
+                                            : (AppFontSize.sizeMedium ?? 20);
+                                        return SizedBox(
+                                          width: constraints.maxWidth,
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
                                             child: Text(
-                                              widget.user.maQR,
+                                              '${AppLanguage.getText('MaThamDu')}: ${widget.user.maQR}',
+                                              maxLines: 1,
+                                              softWrap: false,
+                                              textAlign: TextAlign.center,
                                               style: TextStyle(
-                                                fontSize: qrFontSize,
-                                                color: AppColor.extraColor,
-                                                fontWeight: FontWeight.w900,
+                                                fontSize: codeFontSize,
+                                                fontWeight: FontWeight.w800,
+                                                color: AppColor.successQRCode,
                                               ),
-                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                        );
+                                      },
                                     ),
                                     const SizedBox(height: 20),
-                                    _buildFieldRow(
-                                        loginConfig?.field2, widget.user.field2),
-                                    _buildFieldRow(
-                                        loginConfig?.field3, widget.user.field3),
-                                    _buildFieldRow(
-                                        loginConfig?.field4, widget.user.field4),
-                                    _buildFieldRow(
-                                        loginConfig?.field5, widget.user.field5),
-                                    _buildFieldRow(
-                                        loginConfig?.field6, widget.user.field6),
-                                    _buildFieldRow(
-                                        loginConfig?.field7, widget.user.field7),
-                                    _buildFieldRow(
-                                        loginConfig?.field8, widget.user.field8),
-                                    _buildFieldRow(
-                                        loginConfig?.field9, widget.user.field9),
+                                    _buildFieldRow(loginConfig?.field2,
+                                        widget.user.field2),
+                                    _buildFieldRow(loginConfig?.field3,
+                                        widget.user.field3),
+                                    _buildFieldRow(loginConfig?.field4,
+                                        widget.user.field4),
+                                    _buildFieldRow(loginConfig?.field5,
+                                        widget.user.field5),
+                                    _buildFieldRow(loginConfig?.field6,
+                                        widget.user.field6),
+                                    _buildFieldRow(loginConfig?.field7,
+                                        widget.user.field7),
+                                    _buildFieldRow(loginConfig?.field8,
+                                        widget.user.field8),
+                                    _buildFieldRow(loginConfig?.field9,
+                                        widget.user.field9),
                                     _buildFieldRow(loginConfig?.field10,
                                         widget.user.field10),
                                     _buildFieldRow(loginConfig?.field11,

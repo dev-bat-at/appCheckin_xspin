@@ -37,6 +37,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
       disposeViewModel: false,
       viewModelBuilder: () => _viewModel,
       onViewModelReady: (viewModel) async {
+        await widget.indexViewModel?.refreshSession(reloadList: false);
         await viewModel.loadStatistics();
       },
       builder: (context, viewModel, child) {
@@ -65,7 +66,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
             ),
             child: RefreshIndicator(
               onRefresh: () async {
-                await widget.indexViewModel?.refreshAppLanguage();
+                await widget.indexViewModel?.refreshSession(reloadList: false);
                 await viewModel.loadStatistics();
               },
               color: AppColor.primaryColor,

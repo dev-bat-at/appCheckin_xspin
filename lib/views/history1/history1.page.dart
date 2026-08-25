@@ -7,6 +7,7 @@ import 'package:checkin/constants/app_fontsize.dart';
 import 'package:checkin/model/user.model.dart';
 import 'package:checkin/viewmodel/history_user_checkin.vm.dart';
 import 'package:checkin/viewmodel/index.vm.dart';
+import 'package:checkin/views/history/widgets/history_sum_bar.widget.dart';
 import 'package:checkin/views/history1/widgets/list.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -48,7 +49,7 @@ class _HistoryPage1State extends State<HistoryPage1>
     _scrollController.addListener(_scrollListener);
 
     _tabController.addListener(() {
-      // Cập nhật trạng thái của nút khi chuyển tab
+      if (_tabController.indexIsChanging) return;
       setState(() {
         _isScrollToTopButtonVisible = _scrollStates[_tabController.index];
       });
@@ -93,9 +94,7 @@ class _HistoryPage1State extends State<HistoryPage1>
   }
 
   Future<void> _refreshData() async {
-    await widget.indexViewModel.loginViewModel.loadUser();
-    await widget.indexViewModel.refreshAppLanguage();
-    await widget.usersViewModel.reloadUsers();
+    await widget.indexViewModel.refreshSession();
     if (mounted) setState(() {});
   }
 
@@ -111,9 +110,7 @@ class _HistoryPage1State extends State<HistoryPage1>
         builder: (context, viewModel, child) {
           viewModel.viewContext = context;
 
-          return DefaultTabController(
-            length: 3, // Số lượng Tab
-            child: BasePage(
+          return BasePage(
               showFloating: true,
               showLogo: true,
               floating: _isScrollToTopButtonVisible
@@ -141,111 +138,19 @@ class _HistoryPage1State extends State<HistoryPage1>
                   controller: _scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    SizedBox(
-                      height: 5,
-                    ),
-                    SizedBox(
-                      height: 64,
-                      child: TabBar(
-                        controller: _tabController,
-                        indicatorColor: AppColor.primaryColor,
-                        labelColor: AppColor.darkColor,
-                        labelPadding: EdgeInsets.symmetric(horizontal: 8),
-                        tabs: [
-                          Tab(
-                              height: 64,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    AppLanguage.getText('TatCa'),
-                                    style: TextStyle(fontSize: 13),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  SizedBox(height: 4),
-                                  viewModel.isBusy
-                                      ? LoadingAnimationWidget.progressiveDots(
-                                          color: Colors.orange,
-                                          size: 15,
-                                        )
-                                      : Text(
-                                          '(${widget.usersViewModel.count?.countData})',
-                                          style: TextStyle(
-                                            color: Colors.orange,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                ],
-                              )),
-                          Tab(
-                            height: 64,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  AppLanguage.getText('DaCheckin'),
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      color: _tabController.index == 1
-                                          ? AppColor.darkColor
-                                          : Colors.grey[700],
-                                      fontWeight: _tabController.index == 1
-                                          ? FontWeight.bold
-                                          : null),
-                                  textAlign: TextAlign.center,
-                                ),
-                                SizedBox(height: 4),
-                                viewModel.isBusy
-                                    ? LoadingAnimationWidget.progressiveDots(
-                                        color: AppColor.successQRCode,
-                                        size: 15,
-                                      )
-                                    : Text(
-                                        '(${widget.usersViewModel.countCheckin?.countData})',
-                                        style: TextStyle(
-                                          color: AppColor.successQRCode,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                              ],
-                            ),
-                          ),
-                          Tab(
-                            height: 64,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  AppLanguage.getText('ChuaCheckin'),
-                                  style: TextStyle(fontSize: 13),
-                                  textAlign: TextAlign.center,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                                SizedBox(height: 4),
-                                viewModel.isBusy
-                                    ? LoadingAnimationWidget.progressiveDots(
-                                        color: AppColor.primaryColor,
-                                        size: 15,
-                                      )
-                                    : Text(
-                                        '(${(widget.usersViewModel.count?.countData ?? 0) - (widget.usersViewModel.countCheckin?.countData ?? 0)})',
-                                        style: TextStyle(
-                                          color: AppColor.primaryColor,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 5,
+                    HistorySumBar(
+                      isBusy: viewModel.isBusy,
+                      totalValue:
+                          '${widget.usersViewModel.count?.countData ?? 0}',
+                      checkedInValue:
+                          '${widget.usersViewModel.countCheckin?.countData ?? 0}',
+                      notCheckedInValue:
+                          '${(widget.usersViewModel.count?.countData ?? 0) - (widget.usersViewModel.countCheckin?.countData ?? 0)}',
+                      selectedIndex: _tabController.index,
+                      onTap: (index) {
+                        _tabController.animateTo(index);
+                        setState(() {});
+                      },
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -298,8 +203,7 @@ class _HistoryPage1State extends State<HistoryPage1>
                   ],
                 ),
               ),
-            ),
-          );
+            );
         });
   }
 

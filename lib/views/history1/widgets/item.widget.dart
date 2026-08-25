@@ -37,26 +37,15 @@ class _ItemTicketQRState extends State<ItemTicket> {
   Color get _accentColor =>
       _checkedIn ? AppColor.successQRCode : AppColor.primaryColor;
 
-  /// Parse "dd/MM/yyyy HH:mm" or similar into date + time parts.
-  (String date, String time) _splitDateTime(String? raw) {
-    if (raw == null || raw.trim().isEmpty) {
-      return ('', '');
-    }
-    final value = raw.trim();
-    final parts = value.split(RegExp(r'\s+'));
-    if (parts.length >= 2) {
-      return (parts.first, parts.sublist(1).join(' '));
-    }
-    if (value.contains(':')) {
-      return ('', value);
-    }
-    return (value, '');
+  String get _dateTimeText {
+    final raw = widget.user.ngayCheckin?.trim() ?? '';
+    return raw;
   }
 
   @override
   Widget build(BuildContext context) {
     final showManualActions = _isManualCheckin && widget.user.canManualCheckIn;
-    final (dateText, timeText) = _splitDateTime(widget.user.ngayCheckin);
+    final dateTimeText = _dateTimeText;
 
     return InkWell(
       onTap: showManualActions ? null : widget.onTap,
@@ -83,7 +72,7 @@ class _ItemTicketQRState extends State<ItemTicket> {
                 Container(width: 4, color: _accentColor),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+                    padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -91,94 +80,86 @@ class _ItemTicketQRState extends State<ItemTicket> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                              child: Text(
-                                widget.user.maQR,
-                                style: TextStyle(
-                                  fontWeight: AppFontWeight.bold,
-                                  color: _accentColor,
-                                  fontSize: AppFontSize.sizeSuperSmall,
-                                ),
-                                overflow: TextOverflow.ellipsis,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.user.maQR,
+                                    style: TextStyle(
+                                      fontWeight: AppFontWeight.bold,
+                                      color: _accentColor,
+                                      fontSize: AppFontSize.sizeSuperSmall,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    widget.user.field2 ?? '',
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 3,
+                                    style: TextStyle(
+                                      fontWeight: AppFontWeight.bold,
+                                      fontSize: AppFontSize.sizeSmall,
+                                      color: AppColor.darkColor,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: _checkedIn ? _lightGreenBg : _lightRedBg,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                AppLanguage.getText(
-                                  _checkedIn ? 'DaCheckin' : 'ChuaCheckin',
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: _checkedIn
+                                        ? _lightGreenBg
+                                        : _lightRedBg,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    AppLanguage.getText(
+                                      _checkedIn ? 'DaCheckin' : 'ChuaCheckin',
+                                    ),
+                                    style: TextStyle(
+                                      fontSize: AppFontSize.sizeStatus,
+                                      fontWeight: FontWeight.w700,
+                                      color: _accentColor,
+                                    ),
+                                  ),
                                 ),
-                                style: TextStyle(
-                                  fontSize: AppFontSize.sizeStatus,
-                                  fontWeight: FontWeight.w700,
-                                  color: _accentColor,
-                                ),
-                              ),
+                                if (dateTimeText.isNotEmpty) ...[
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.calendar_today_outlined,
+                                        size: 13,
+                                        color: _mutedGrey,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        dateTimeText,
+                                        style: const TextStyle(
+                                          color: _mutedGrey,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ],
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          widget.user.field2 ?? '',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          style: TextStyle(
-                            fontWeight: AppFontWeight.bold,
-                            fontSize: AppFontSize.sizeSmall,
-                            color: AppColor.darkColor,
-                          ),
-                        ),
-                        if (dateText.isNotEmpty || timeText.isNotEmpty) ...[
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              const Spacer(),
-                              if (dateText.isNotEmpty) ...[
-                                const Icon(
-                                  Icons.calendar_today_outlined,
-                                  size: 14,
-                                  color: _mutedGrey,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  dateText,
-                                  style: const TextStyle(
-                                    color: _mutedGrey,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                              if (dateText.isNotEmpty && timeText.isNotEmpty)
-                                const SizedBox(width: 10),
-                              if (timeText.isNotEmpty) ...[
-                                const Icon(
-                                  Icons.access_time,
-                                  size: 14,
-                                  color: _mutedGrey,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  timeText,
-                                  style: const TextStyle(
-                                    color: _mutedGrey,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ],
                         if (showManualActions) ...[
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 14),
                           Row(
                             children: [
                               OutlinedButton(

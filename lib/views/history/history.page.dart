@@ -10,6 +10,7 @@ import 'package:checkin/base/base_page.dart';
 import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/viewmodel/index.vm.dart';
 import 'package:checkin/viewmodel/history_users.vm.dart';
+import 'package:checkin/views/history/widgets/history_sum_bar.widget.dart';
 import 'package:checkin/views/history/widgets/list.widget.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:stacked/stacked.dart';
@@ -32,7 +33,7 @@ class _HistoryPageState extends State<HistoryPage>
   Timer? _searchDebounce;
   bool _isScrollToTopButtonVisible = false;
 
-  List<bool> _scrollStates = [false, false, false];
+  List<bool> _scrollStates = [false, false];
 
   @override
   void initState() {
@@ -41,8 +42,6 @@ class _HistoryPageState extends State<HistoryPage>
         TextEditingController(text: widget.usersViewModel.searchQuery);
     _tabController = TabController(length: 2, vsync: this);
     _scrollController = ScrollController();
-    _scrollController.jumpTo;
-    // Lắng nghe sự thay đổi của _searchController và gọi API khi người dùng nhập
     _searchController.addListener(() {
       _onSearchChanged();
     });
@@ -50,7 +49,6 @@ class _HistoryPageState extends State<HistoryPage>
     _scrollController.addListener(_scrollListener);
 
     _tabController.addListener(() {
-      // Cập nhật trạng thái của nút khi chuyển tab
       setState(() {
         _isScrollToTopButtonVisible = _scrollStates[_tabController.index];
       });
@@ -70,7 +68,6 @@ class _HistoryPageState extends State<HistoryPage>
         _isScrollToTopButtonVisible = false;
       });
     }
-    _scrollController.offset;
   }
 
   void _onSearchChanged() {
@@ -101,9 +98,7 @@ class _HistoryPageState extends State<HistoryPage>
   }
 
   Future<void> _refreshData() async {
-    await widget.indexViewModel.loginViewModel.loadUser();
-    await widget.indexViewModel.refreshAppLanguage();
-    await widget.usersViewModel.reloadUsers();
+    await widget.indexViewModel.refreshSession();
     if (mounted) setState(() {});
   }
 
@@ -118,6 +113,11 @@ class _HistoryPageState extends State<HistoryPage>
         },
         builder: (context, viewModel, child) {
           viewModel.viewContext = context;
+
+          final totalCount = widget.usersViewModel.count?.countData ?? 0;
+          final checkedInCount =
+              widget.usersViewModel.countCheckin?.countData ?? 0;
+          final notCheckedInCount = totalCount - checkedInCount;
 
           return DefaultTabController(
             length: 2,
@@ -149,94 +149,12 @@ class _HistoryPageState extends State<HistoryPage>
                   controller: _scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Table(
-                        border: TableBorder.all(
-                            color: AppColor.oriColor
-                                .withOpacity(0.5), // Đường viền bảng
-                            width: 1,
-                            borderRadius: BorderRadius.circular(20)),
-                        defaultVerticalAlignment:
-                            TableCellVerticalAlignment.middle,
-                        columnWidths: const {
-                          0: FlexColumnWidth(1),
-                          1: FlexColumnWidth(1),
-                          2: FlexColumnWidth(1),
-                        },
-                        children: [
-                          TableRow(
-                            decoration: BoxDecoration(
-                                color: AppColor.successQRCode,
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(20),
-                                    topRight: Radius.circular(20))),
-                            children: [
-                              _buildCell(AppLanguage.getText('TongLuot'),
-                                  AppColor.extraColor),
-                              _buildCell(AppLanguage.getText('DaCheckin'),
-                                  AppColor.extraColor),
-                              _buildCell(AppLanguage.getText('ChuaCheckin'),
-                                  AppColor.extraColor),
-                            ],
-                          ),
-                          TableRow(
-                            children: [
-                              Center(
-                                child: viewModel.isBusy
-                                    ? LoadingAnimationWidget.progressiveDots(
-                                        color: AppColor.oriColor,
-                                        size: 15,
-                                      )
-                                    : Text(
-                                        '${widget.usersViewModel.count?.countData ?? 0}',
-                                        style: TextStyle(
-                                          fontFamily: 'Inter',
-                                          fontSize: AppFontSize.sizeTable,
-                                          color: AppColor.oriColor,
-                                          fontWeight: FontWeight.w900,
-                                        ),
-                                      ),
-                              ),
-                              Center(
-                                child: viewModel.isBusy
-                                    ? LoadingAnimationWidget.progressiveDots(
-                                        color: AppColor.successQRCode,
-                                        size: 15,
-                                      )
-                                    : Text(
-                                        '${widget.usersViewModel.countCheckin?.countData ?? 0}',
-                                        style: TextStyle(
-                                          fontFamily: 'Inter',
-                                          fontSize: AppFontSize.sizeTable,
-                                          color: AppColor.successQRCode,
-                                          fontWeight: FontWeight.w900,
-                                        ),
-                                      ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Center(
-                                  child: viewModel.isBusy
-                                      ? LoadingAnimationWidget.progressiveDots(
-                                          color: AppColor.primaryColor,
-                                          size: 15,
-                                        )
-                                      : Text(
-                                          '${(widget.usersViewModel.count?.countData ?? 0) - (widget.usersViewModel.countCheckin?.countData ?? 0)}',
-                                          style: TextStyle(
-                                            fontFamily: 'Inter',
-                                            fontSize: AppFontSize.sizeTable,
-                                            color: AppColor.primaryColor,
-                                            fontWeight: FontWeight.w900,
-                                          ),
-                                        ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                    HistorySumBar(
+                      isBusy: viewModel.isBusy,
+                      totalLabel: AppLanguage.getText('TongLuot'),
+                      totalValue: '$totalCount',
+                      checkedInValue: '$checkedInCount',
+                      notCheckedInValue: '$notCheckedInCount',
                     ),
                     TabBar(
                       controller: _tabController,
@@ -302,8 +220,7 @@ class _HistoryPageState extends State<HistoryPage>
                             flex: 1,
                             child: Padding(
                               padding: const EdgeInsets.all(5.0),
-                              child: Container(
-                                // width: MediaQuery.of(context).size.width / 2.5,
+                              child: SizedBox(
                                 height: 40,
                                 child: TextField(
                                   controller: _searchController,
@@ -343,19 +260,16 @@ class _HistoryPageState extends State<HistoryPage>
                             flex: 1,
                             child: Padding(
                               padding: const EdgeInsets.only(right: 5),
-                              child: Container(
+                              child: SizedBox(
                                 height: 40,
-                                // width: MediaQuery.of(context).size.width * 0.55,
                                 child: DropdownButtonFormField2<String>(
                                   isExpanded: true,
                                   alignment: Alignment.centerLeft,
                                   isDense: true,
-                                  // iconStyleData: IconStyleData(iconSize: 15),
                                   value: widget.usersViewModel.selectedStatus,
                                   decoration: InputDecoration(
                                     contentPadding: const EdgeInsets.symmetric(
                                       vertical: 5.0,
-                                      // horizontal: 8.0,
                                     ),
                                     fillColor: AppColor.extraColor,
                                     filled: true,
@@ -379,7 +293,6 @@ class _HistoryPageState extends State<HistoryPage>
                                         ),
                                       ),
                                     ),
-                                    // Map các giá trị từ viewModel.userStatus
                                     ...viewModel.userStatus.map((status) {
                                       return DropdownMenuItem<String>(
                                         value: status.idStatus,
@@ -400,20 +313,12 @@ class _HistoryPageState extends State<HistoryPage>
                                   ],
                                   onChanged: (value) {
                                     if (value == 'all') {
-                                      viewModel.isBusy
-                                          ? CircularProgressIndicator(
-                                              color: AppColor.primaryColor,
-                                            )
-                                          : widget.usersViewModel.getUsers();
+                                      widget.usersViewModel.getUsers();
                                       widget.usersViewModel
                                           .getCountUserJoin('');
                                     } else {
-                                      viewModel.isBusy
-                                          ? CircularProgressIndicator(
-                                              color: AppColor.primaryColor,
-                                            )
-                                          : widget.usersViewModel
-                                              .getUsersByStatus(value);
+                                      widget.usersViewModel
+                                          .getUsersByStatus(value);
                                       widget.usersViewModel
                                           .getCountUserJoin(value);
                                     }
@@ -421,8 +326,6 @@ class _HistoryPageState extends State<HistoryPage>
                                       widget.usersViewModel
                                           .updateSelectedStatus(value!);
                                     });
-                                    print(
-                                        'Nhấn trạng thái : ${widget.usersViewModel.selectedStatus}');
                                   },
                                 ),
                               ),
@@ -434,7 +337,7 @@ class _HistoryPageState extends State<HistoryPage>
                       Padding(
                         padding: const EdgeInsets.only(
                             top: 5, bottom: 5, left: 10, right: 10),
-                        child: Container(
+                        child: SizedBox(
                           width: MediaQuery.of(context).size.width * 0.5,
                           height: 40,
                           child: TextField(
@@ -519,8 +422,7 @@ class _HistoryPageState extends State<HistoryPage>
                         ),
                         child: TextButton(
                           onPressed: () async {
-                            await widget.usersViewModel
-                                .loadMoreUsers(tabKey);
+                            await widget.usersViewModel.loadMoreUsers(tabKey);
                           },
                           child: Text(
                             AppLanguage.getText('XemThem'),
@@ -534,19 +436,4 @@ class _HistoryPageState extends State<HistoryPage>
       ],
     );
   }
-}
-
-Widget _buildCell(String text, Color color) {
-  return Padding(
-    padding: const EdgeInsets.all(5),
-    child: Text(
-      text,
-      textAlign: TextAlign.center,
-      style: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: AppFontSize.sizeSmall,
-          fontWeight: FontWeight.bold,
-          color: color),
-    ),
-  );
 }

@@ -33,22 +33,38 @@ class IndexViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  Future<void> _reloadCurrentPage() async {
+  /// Refresh config từ DangNhap rồi cập nhật UI (đổi NL/1L, nút check-in thủ công, ...).
+  Future<void> refreshSession({bool reloadList = true}) async {
     await loginViewModel.loadUser();
     await refreshAppLanguage();
+    notifyListeners();
+
+    if (!reloadList) {
+      return;
+    }
+
+    final loaiCheckin = AppSP.get(AppSPKey.loaiCheckin)?.toString() ?? '';
+    if (loaiCheckin == 'NL') {
+      await usersViewModel.reloadUsers();
+    } else if (loaiCheckin == '1L') {
+      await historyViewModel.reloadUsers();
+    }
+  }
+
+  Future<void> _reloadCurrentPage() async {
+    await refreshSession(reloadList: currentIndex == 0);
     if (currentIndex == 0) {
-      if (AppSP.get(AppSPKey.loaiCheckin) == 'NL') {
-        await usersViewModel.reloadUsers();
-        _isQRCodePageInitialized = false;
-        print("Đây là trạng thái : ${usersViewModel.selectedStatus}");
-      } else if (AppSP.get(AppSPKey.loaiCheckin) == '1L') {
-        await historyViewModel.reloadUsers();
-        _isQRCodePageInitialized = false;
-      }
+      _isQRCodePageInitialized = false;
     }
     if (currentIndex == 2) {
-      loginViewModel.loadUser();
-      usersViewModel.getCountUserCheckIn();
+      final loaiCheckin = AppSP.get(AppSPKey.loaiCheckin)?.toString() ?? '';
+      if (loaiCheckin == '1L') {
+        await historyViewModel.getCountUserCheckIn();
+        await historyViewModel.getCountUser();
+      } else {
+        await usersViewModel.getCountUserCheckIn();
+        await usersViewModel.getCountUser();
+      }
     }
   }
 
@@ -62,9 +78,15 @@ class IndexViewModel extends BaseViewModel {
       if (index == 1 && !_isQRCodePageInitialized) {
         _isQRCodePageInitialized = true;
       } else if (index == 2) {
-        loginViewModel.loadUser();
-        usersViewModel.getCountUserCheckIn();
-        usersViewModel.getCountUser();
+        await loginViewModel.loadUser();
+        final loaiCheckin = AppSP.get(AppSPKey.loaiCheckin)?.toString() ?? '';
+        if (loaiCheckin == '1L') {
+          historyViewModel.getCountUserCheckIn();
+          historyViewModel.getCountUser();
+        } else {
+          usersViewModel.getCountUserCheckIn();
+          usersViewModel.getCountUser();
+        }
         _isQRCodePageInitialized = false;
       } else if (index == 0) {
         _isQRCodePageInitialized = false;

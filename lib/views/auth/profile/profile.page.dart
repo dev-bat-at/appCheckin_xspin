@@ -23,9 +23,9 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   Future<void> _refreshData() async {
-    await widget.indexViewModel.refreshAppLanguage();
-    await widget.loginViewModel.loadUser();
+    await widget.indexViewModel.refreshSession(reloadList: false);
     await _loadCounters();
+    if (mounted) setState(() {});
   }
 
   bool isExpanded = false;
@@ -52,8 +52,9 @@ class _ProfilePageState extends State<ProfilePage> {
           if (!mounted) {
             return;
           }
-          await viewModel.loadUser();
+          await widget.indexViewModel.refreshSession(reloadList: false);
           await _loadCounters();
+          if (mounted) setState(() {});
         });
       },
       builder: (context, viewModel, child) {
