@@ -179,6 +179,9 @@ class Users {
   bool get canManualCheckIn {
     if (maTinhTrang == 'DaCheckinXong') return false;
     if (tinhTrang == 'Đã check-in') return false;
+    if (soLuotCheckIntoida != null && dacheckIn != null) {
+      return dacheckIn! < soLuotCheckIntoida!;
+    }
     if (chuaCheckin != null) return chuaCheckin! > 0;
     return !isCheckin;
   }

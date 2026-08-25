@@ -101,9 +101,10 @@ class _HistoryPageState extends State<HistoryPage>
   }
 
   Future<void> _refreshData() async {
+    await widget.indexViewModel.loginViewModel.loadUser();
     await widget.indexViewModel.refreshAppLanguage();
-    setState(() {});
     await widget.usersViewModel.reloadUsers();
+    if (mounted) setState(() {});
   }
 
   @override
@@ -497,7 +498,7 @@ class _HistoryPageState extends State<HistoryPage>
           usersViewModel: widget.usersViewModel,
           users: users,
         ),
-        if (users.isNotEmpty)
+        if (widget.usersViewModel.hasMoreData(tabKey))
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Center(
@@ -508,29 +509,27 @@ class _HistoryPageState extends State<HistoryPage>
                     ? CircularProgressIndicator(
                         color: AppColor.primaryColor,
                       )
-                    : widget.usersViewModel.hasMoreData(tabKey)
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10.0,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColor.primaryColor,
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            child: TextButton(
-                              onPressed: () async {
-                                await widget.usersViewModel
-                                    .loadMoreUsers(tabKey);
-                              },
-                              child: Text(
-                                AppLanguage.getText('XemThem'),
-                                style: TextStyle(
-                                    color: AppColor.extraColor,
-                                    fontSize: AppFontSize.sizeSuperSmall),
-                              ),
-                            ),
-                          )
-                        : SizedBox.shrink()),
+                    : Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10.0,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColor.primaryColor,
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        child: TextButton(
+                          onPressed: () async {
+                            await widget.usersViewModel
+                                .loadMoreUsers(tabKey);
+                          },
+                          child: Text(
+                            AppLanguage.getText('XemThem'),
+                            style: TextStyle(
+                                color: AppColor.extraColor,
+                                fontSize: AppFontSize.sizeSuperSmall),
+                          ),
+                        ),
+                      )),
           ),
       ],
     );

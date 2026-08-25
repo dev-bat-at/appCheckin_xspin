@@ -3,7 +3,6 @@ import 'package:checkin/constants/app_color.dart';
 import 'package:checkin/constants/app_fontsize.dart';
 import 'package:checkin/model/user.model.dart';
 import 'package:checkin/viewmodel/login.vm.dart';
-import 'package:checkin/views/history/widgets/manual_checkin_success.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -35,16 +34,12 @@ class _ConfirmCheckinPageState extends State<ConfirmCheckinPage> {
       final success = await widget.onConfirm(widget.user);
       if (!mounted) return;
       if (success) {
-        // One transition: replace confirm with success (no flash back to list).
-        await Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ManualCheckinSuccessPage(
-              user: widget.user,
-              onBackToList: widget.onBackToList,
-            ),
-          ),
-        );
+        if (widget.onBackToList != null) {
+          await widget.onBackToList!();
+        }
+        if (mounted) {
+          Navigator.pop(context);
+        }
       }
     } finally {
       if (mounted) {
@@ -61,6 +56,18 @@ class _ConfirmCheckinPageState extends State<ConfirmCheckinPage> {
         await loginViewModel.loadUser();
       },
       builder: (context, loginViewModel, child) {
+        final mediaQuery = MediaQuery.of(context);
+        final isTablet = mediaQuery.size.shortestSide >= 600;
+        final maxContentWidth = isTablet ? 620.0 : double.infinity;
+        final pagePadding = isTablet ? 32.0 : 20.0;
+        final titleFontSize = isTablet
+            ? (AppFontSize.sizeLarge ?? 24) + 4
+            : (AppFontSize.sizeLarge ?? 24);
+        final qrFontSize = isTablet
+            ? (AppFontSize.sizeSuperLarge ?? 32) + 2
+            : (AppFontSize.sizeSuperLarge ?? 32);
+        final loginConfig = loginViewModel.userLogin;
+
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle.dark.copyWith(
             statusBarColor: Colors.white,
@@ -77,153 +84,172 @@ class _ConfirmCheckinPageState extends State<ConfirmCheckinPage> {
                         size: 50,
                       ),
                     )
-                  : Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 12),
-                          Text(
-                            AppLanguage.getText('XacNhanCheckin').toUpperCase(),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: AppColor.successQRCode,
-                              fontSize: AppFontSize.sizeMedium ?? 20,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 28),
-                          Expanded(
-                            child: SingleChildScrollView(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildFieldSection(
-                                    loginViewModel.userLogin?.field2,
-                                    widget.user.field2,
-                                  ),
-                                  _buildFieldSection(
-                                    loginViewModel.userLogin?.field3,
-                                    widget.user.field3,
-                                  ),
-                                  _buildFieldSection(
-                                    loginViewModel.userLogin?.field4,
-                                    widget.user.field4,
-                                  ),
-                                  _buildFieldSection(
-                                    loginViewModel.userLogin?.field5,
-                                    widget.user.field5,
-                                  ),
-                                  _buildFieldSection(
-                                    loginViewModel.userLogin?.field6,
-                                    widget.user.field6,
-                                  ),
-                                  _buildFieldSection(
-                                    loginViewModel.userLogin?.field7,
-                                    widget.user.field7,
-                                  ),
-                                  _buildFieldSection(
-                                    loginViewModel.userLogin?.field8,
-                                    widget.user.field8,
-                                  ),
-                                  _buildFieldSection(
-                                    loginViewModel.userLogin?.field9,
-                                    widget.user.field9,
-                                  ),
-                                  _buildFieldSection(
-                                    loginViewModel.userLogin?.field10,
-                                    widget.user.field10,
-                                  ),
-                                  _buildFieldSection(
-                                    loginViewModel.userLogin?.field11,
-                                    widget.user.field11,
-                                  ),
-                                  _buildFieldSection(
-                                    loginViewModel.userLogin?.field12,
-                                    widget.user.field12,
-                                  ),
-                                  _buildFieldSection(
-                                    loginViewModel.userLogin?.field13,
-                                    widget.user.field13,
-                                  ),
-                                  _buildFieldSection(
-                                    loginViewModel.userLogin?.field14,
-                                    widget.user.field14,
-                                  ),
-                                  _buildFieldSection(
-                                    loginViewModel.userLogin?.field15,
-                                    widget.user.field15,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton(
-                              onPressed: _isSubmitting ? null : _handleConfirm,
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: AppColor.successQRCode,
-                                side: BorderSide(
-                                  color: AppColor.successQRCode,
-                                  width: 1.5,
-                                ),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: _isSubmitting
-                                  ? SizedBox(
-                                      height: 22,
-                                      width: 22,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
+                  : Column(
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: EdgeInsets.all(pagePadding),
+                            child: Center(
+                              child: ConstrainedBox(
+                                constraints:
+                                    BoxConstraints(maxWidth: maxContentWidth),
+                                child: Column(
+                                  children: [
+                                    SizedBox(height: isTablet ? 28 : 20),
+                                    Text(
+                                      AppLanguage.getText('XacNhanCheckin')
+                                          .toUpperCase(),
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: titleFontSize,
+                                        fontWeight: FontWeight.w900,
                                         color: AppColor.successQRCode,
                                       ),
-                                    )
-                                  : Text(
-                                      AppLanguage.getText('XacNhan')
-                                          .toUpperCase(),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 16,
-                                      ),
                                     ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton(
-                              onPressed: _isSubmitting
-                                  ? null
-                                  : () => Navigator.pop(context),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: AppColor.primaryColor,
-                                side: BorderSide(
-                                  color: AppColor.primaryColor,
-                                  width: 1.5,
-                                ),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                                    const SizedBox(height: 16),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          '${AppLanguage.getText('MaThamDu')}:',
+                                          style: TextStyle(
+                                            fontSize: qrFontSize,
+                                            fontWeight: FontWeight.w900,
+                                            color: AppColor.successQRCode,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Flexible(
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 5,
+                                              horizontal: 10,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColor.successQRCode,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              widget.user.maQR,
+                                              style: TextStyle(
+                                                fontSize: qrFontSize,
+                                                color: AppColor.extraColor,
+                                                fontWeight: FontWeight.w900,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 20),
+                                    _buildFieldRow(
+                                        loginConfig?.field2, widget.user.field2),
+                                    _buildFieldRow(
+                                        loginConfig?.field3, widget.user.field3),
+                                    _buildFieldRow(
+                                        loginConfig?.field4, widget.user.field4),
+                                    _buildFieldRow(
+                                        loginConfig?.field5, widget.user.field5),
+                                    _buildFieldRow(
+                                        loginConfig?.field6, widget.user.field6),
+                                    _buildFieldRow(
+                                        loginConfig?.field7, widget.user.field7),
+                                    _buildFieldRow(
+                                        loginConfig?.field8, widget.user.field8),
+                                    _buildFieldRow(
+                                        loginConfig?.field9, widget.user.field9),
+                                    _buildFieldRow(loginConfig?.field10,
+                                        widget.user.field10),
+                                    _buildFieldRow(loginConfig?.field11,
+                                        widget.user.field11),
+                                    _buildFieldRow(loginConfig?.field12,
+                                        widget.user.field12),
+                                    _buildFieldRow(loginConfig?.field13,
+                                        widget.user.field13),
+                                    _buildFieldRow(loginConfig?.field14,
+                                        widget.user.field14),
+                                    _buildFieldRow(loginConfig?.field15,
+                                        widget.user.field15),
+                                  ],
                                 ),
                               ),
-                              child: Text(
-                                AppLanguage.getText('Dong').toUpperCase(),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 16,
-                                ),
-                              ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(
+                              pagePadding, 8, pagePadding, pagePadding),
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                width: double.infinity,
+                                child: OutlinedButton(
+                                  onPressed:
+                                      _isSubmitting ? null : _handleConfirm,
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: AppColor.successQRCode,
+                                    side: BorderSide(
+                                      color: AppColor.successQRCode,
+                                      width: 1.5,
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: _isSubmitting
+                                      ? SizedBox(
+                                          height: 22,
+                                          width: 22,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: AppColor.successQRCode,
+                                          ),
+                                        )
+                                      : Text(
+                                          AppLanguage.getText('XacNhan')
+                                              .toUpperCase(),
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                width: double.infinity,
+                                child: OutlinedButton(
+                                  onPressed: _isSubmitting
+                                      ? null
+                                      : () => Navigator.pop(context),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: AppColor.primaryColor,
+                                    side: BorderSide(
+                                      color: AppColor.primaryColor,
+                                      width: 1.5,
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    AppLanguage.getText('Dong').toUpperCase(),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
             ),
           ),
@@ -232,34 +258,46 @@ class _ConfirmCheckinPageState extends State<ConfirmCheckinPage> {
     );
   }
 
-  Widget _buildFieldSection(String? loginField, String? userField) {
-    if ((loginField == null || loginField.isEmpty) &&
-        (userField == null || userField.isEmpty)) {
+  /// Same presentation as [SuccessScreenQR] field rows (no gray fill).
+  Widget _buildFieldRow(String? loginField, String? userField) {
+    if (loginField == null && userField == null) {
       return const SizedBox.shrink();
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (loginField != null && loginField.isNotEmpty)
+        if (loginField != null) ...[
           Text(
-            loginField,
+            '$loginField:',
             style: TextStyle(
               fontSize: AppFontSize.sizeSmall,
-              fontWeight: AppFontWeight.bold,
-              color: AppColor.darkColor,
+              color: AppColor.successQRCode,
+              fontWeight: FontWeight.w900,
             ),
           ),
+        ],
         const SizedBox(height: 8),
-        if (userField != null && userField.isNotEmpty)
-          Text(
-            userField,
-            style: TextStyle(
-              fontSize: AppFontSize.sizeSmall,
-              color: AppColor.darkColor,
+        if (userField != null && userField.isNotEmpty) ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: AppColor.successQRCode,
+                width: 1.5,
+              ),
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Text(
+              userField,
+              style: TextStyle(
+                fontSize: AppFontSize.sizeMedium,
+              ),
             ),
           ),
-        const Divider(height: 32, thickness: 1),
+        ],
+        const Divider(height: 15, thickness: 0.1),
       ],
     );
   }

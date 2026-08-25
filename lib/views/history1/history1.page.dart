@@ -93,9 +93,10 @@ class _HistoryPage1State extends State<HistoryPage1>
   }
 
   Future<void> _refreshData() async {
+    await widget.indexViewModel.loginViewModel.loadUser();
     await widget.indexViewModel.refreshAppLanguage();
-    setState(() {});
     await widget.usersViewModel.reloadUsers();
+    if (mounted) setState(() {});
   }
 
   @override
@@ -218,7 +219,7 @@ class _HistoryPage1State extends State<HistoryPage1>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  'Chưa Checkin',
+                                  AppLanguage.getText('ChuaCheckin'),
                                   style: TextStyle(fontSize: 13),
                                   textAlign: TextAlign.center,
                                   overflow: TextOverflow.ellipsis,
@@ -305,13 +306,12 @@ class _HistoryPage1State extends State<HistoryPage1>
   Widget buildUserList(List<Users> users, String tabKey) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      // key: PageStorageKey(tabKey),
       children: [
         ListUserCheckin(
           usersViewModel: widget.usersViewModel,
           users: users,
         ),
-        if (users.length >= 10) // Giả sử mỗi trang trả về tối đa 10 người dùng
+        if (widget.usersViewModel.hasMoreData(tabKey))
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Center(
@@ -337,7 +337,7 @@ class _HistoryPage1State extends State<HistoryPage1>
                             await widget.usersViewModel.loadMoreUsers(tabKey);
                           },
                           child: Text(
-                            "Xem thêm",
+                            AppLanguage.getText('XemThem'),
                             style: TextStyle(
                                 color: AppColor.extraColor,
                                 fontSize: AppFontSize.sizeSuperSmall),

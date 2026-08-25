@@ -48,6 +48,7 @@ class AppLanguage {
     'ThoiGianCheckin': 'Thời gian check-in',
     'DiaDiem': 'Địa điểm',
     'MaQR': 'Mã QR',
+    'MaThamDu': 'Mã tham dự',
     'CheckinQRCode': 'Checkin QR Code',
 
     // Line selection & Navigation center

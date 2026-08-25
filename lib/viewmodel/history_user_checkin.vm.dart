@@ -215,6 +215,22 @@ class HistoryCheckinViewModel extends BaseViewModel {
     currentPageNotCheckedIn = 1;
   }
 
+  bool hasMoreData(String tabKey) {
+    if (tabKey == 'allTab') {
+      final total = count?.countData ?? 0;
+      return total > 0 && lstUsers.length < total;
+    }
+    if (tabKey == 'checkedInTab') {
+      final total = countCheckin?.countData ?? 0;
+      return total > 0 && checkInUser.length < total;
+    }
+    if (tabKey == 'notCheckedInTab') {
+      final total = (count?.countData ?? 0) - (countCheckin?.countData ?? 0);
+      return total > 0 && notCheckIntUser.length < total;
+    }
+    return false;
+  }
+
   void markNeedsReload() {
     _hasLoadedInitialData = false;
   }

@@ -34,6 +34,7 @@ class IndexViewModel extends BaseViewModel {
   }
 
   Future<void> _reloadCurrentPage() async {
+    await loginViewModel.loadUser();
     await refreshAppLanguage();
     if (currentIndex == 0) {
       if (AppSP.get(AppSPKey.loaiCheckin) == 'NL') {

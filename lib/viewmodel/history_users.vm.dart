@@ -214,10 +214,12 @@ class UsersViewModel extends BaseViewModel {
 
   bool hasMoreData(String tabKey) {
     if (tabKey == 'allTab') {
-      return lstUsers.length < countUser!.countData;
-    } else if (tabKey == 'checkedInTab') {
-      return checkInUser.length <
-          countCheckin!.countData; // So sánh cho tab CheckIn
+      final total = countUser?.countData ?? 0;
+      return total > 0 && lstUsers.length < total;
+    }
+    if (tabKey == 'checkedInTab') {
+      final total = countCheckin?.countData ?? 0;
+      return total > 0 && checkInUser.length < total;
     }
     return false;
   }
