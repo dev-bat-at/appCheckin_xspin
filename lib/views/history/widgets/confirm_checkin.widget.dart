@@ -107,29 +107,48 @@ class _ConfirmCheckinPageState extends State<ConfirmCheckinPage> {
                                       ),
                                     ),
                                     const SizedBox(height: 16),
-                                    LayoutBuilder(
-                                      builder: (context, constraints) {
-                                        final codeFontSize = isTablet
-                                            ? qrFontSize
-                                            : (AppFontSize.sizeMedium ?? 20);
-                                        return SizedBox(
-                                          width: constraints.maxWidth,
-                                          child: FittedBox(
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          final codeFontSize = isTablet
+                                              ? qrFontSize
+                                              : (AppFontSize.sizeMedium ?? 20);
+                                          return FittedBox(
                                             fit: BoxFit.scaleDown,
-                                            child: Text(
-                                              '${AppLanguage.getText('MaThamDu')}: ${widget.user.maQR}',
+                                            alignment: Alignment.centerLeft,
+                                            child: Text.rich(
+                                              TextSpan(
+                                                children: [
+                                                  TextSpan(
+                                                    text:
+                                                        '${AppLanguage.getText('MaThamDu')}: ',
+                                                    style: TextStyle(
+                                                      fontSize: codeFontSize,
+                                                      fontWeight:
+                                                          FontWeight.w800,
+                                                      color: AppColor
+                                                          .successQRCode,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: widget.user.maQR,
+                                                    style: TextStyle(
+                                                      fontSize: codeFontSize,
+                                                      fontWeight:
+                                                          FontWeight.w800,
+                                                      color:
+                                                          AppColor.darkColor,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                               maxLines: 1,
                                               softWrap: false,
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: codeFontSize,
-                                                fontWeight: FontWeight.w800,
-                                                color: AppColor.successQRCode,
-                                              ),
                                             ),
-                                          ),
-                                        );
-                                      },
+                                          );
+                                        },
+                                      ),
                                     ),
                                     const SizedBox(height: 20),
                                     _buildFieldRow(loginConfig?.field2,

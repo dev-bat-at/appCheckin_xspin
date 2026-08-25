@@ -173,7 +173,7 @@ class _ItemTicketQRState extends State<ItemTicketQR> {
                                 onPressed: widget.onTap,
                                 icon: Icon(
                                   Icons.visibility_outlined,
-                                  color: AppColor.darkColor,
+                                  color: AppColor.darkColor.withValues(alpha: 0.4),
                                 ),
                               ),
                             ],
